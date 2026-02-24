@@ -1,0 +1,30 @@
+CiCLO 1-2026
+Microprogramacion C7	   XXXXXXXXXX
+Diseño de sistemas I C7    XXXXXXXXXX
+Metodos de Optimizacion C5 XXXXXXXXXX
+Tecnica Electiva II C7	
+Tecnica Electiva III C7	
+
+Recursos Humanos C9
+****************************************************
+CICLO 2-2026
+Comunicaciones I C8
+Sistemas Operativos C8
+Análisis Financiero C8
+Diseño de sistemas II C8
+Tecnica Electiva IV C8
+
+CiCLO 1-2027
+Legislación Profesional	C9
+
+Bases de Datos C9
+Sistemas de Información Gerencial C9
+Tecnica Electiva V C9
+
+CiCLO 2-2027
+Consultoría Profesional	C10
+Administración de Centros de Cómputo C10
+Administración de Proyectos Informáticos C10
+Tecnica Electiva VI C10
+
+2028  - TRABAJO DE GRADUACIÓN
