@@ -1,0 +1,19 @@
+Partlist exported from C:/Users/Luis Vasquez/Documents/EAGLE/projects/Tarea 1 – Diseño y fabricación de PCB/Tarea1.sch at 9/4/2026 08:22 p.m.
+
+Part          Value                                   Device                                  Package            Description                                       MF MPN OC_FARNELL OC_NEWARK POPULARITY SPICEPREFIX
+B1            ARDUINO_UNO_R3_SHIELDUNO_R3_SHIELD_LOCK ARDUINO_UNO_R3_SHIELDUNO_R3_SHIELD_LOCK UNO_R3_SHIELD_LOCK Arduino R3 Shield Footprint                                                                         
+HD44780LC16X2 EA_DIP                                  EA_DIP                                  EA_DIP             LCD-MODUL 2x16 - 6,68mm, INKL. KONTROLLER HD44780                             0                     
+R1            2.2k                                    R-US_0207/10                            0207/10            RESISTOR, American symbol                                                     36         R          
+R2            1k                                      TRIM_EU-B25P                            B25P               POTENTIOMETER                                                                 7                     
+R3            1k                                      TRIM_EU-B25P                            B25P               POTENTIOMETER                                                                 7                     
+R4            4.7k                                    R-US_0207/10                            0207/10            RESISTOR, American symbol                                                     36         R          
+R5            4.7k                                    R-US_0207/10                            0207/10            RESISTOR, American symbol                                                     36         R          
+R6            4.7k                                    R-US_0207/10                            0207/10            RESISTOR, American symbol                                                     36         R          
+R7            4.7k                                    R-US_0207/10                            0207/10            RESISTOR, American symbol                                                     36         R          
+R8            220                                     R-US_0207/10                            0207/10            RESISTOR, American symbol                                                     36         R          
+R9            12k                                     R-US_0207/10                            0207/10            RESISTOR, American symbol                                                     36         R          
+R10           22k                                     R-US_0207/10                            0207/10            RESISTOR, American symbol                                                     36         R          
+S2                                                    SD4-04                                  SD4-04             DIL/CODE SWITCH                                          unknown    unknown                         
+SV1           MODULO LM35                             MA03-1                                  MA03-1             PIN HEADER                                               unknown    unknown   48                    
+SV2           MODULO BTHC05                           MA06-1                                  MA06-1             PIN HEADER                                               unknown    unknown   28                    
+T1            2N2222                                  2N2222                                  TO18               NPN TRANSISTOR                                                                4                     
