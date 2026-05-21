@@ -1,0 +1,32 @@
+INSTALAR MYSQL	 		mysql --version ó netstat -an | findstr 3306
+INSTALAR MYSQL WordBenck 
+
+Instalar MAVEN 			mvn -v
+Si no funciona crear una variable de entorno
+MAVEN_HOME
+C:\apache-maven-3.9.10-bin\apache-maven-3.9.10
+path
+%MAVEN_HOME%\bin
+Crear Proyecto springboot con dependencias en --> https://start.spring.io/index.html (ya está echo)
+mvn spring-boot:run
+
+INSTALAR NODE.JS
+path
+C:\Program Files\nodejs\
+
+
+CREAR PROYECTO VITE (ya está echo)
+como dependencia --> npm create vite@latest frontend
+
+npm install
+npm run dev
+
+
+INSTALAR JAVA JDK 17 		java -version javac -version
+JAVA_HOME
+C:\Program Files\Java\jdk-17
+path
+%JAVA_HOME%\bin
+
+
+
