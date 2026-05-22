@@ -1,0 +1,145 @@
+2026-05-20T05:37:19.496Z [INFO] ----------------------invoke appmod-report-event----------------------
+2026-05-20T05:37:19.497Z [INFO] [Tool.invoke]({name: appmod-report-event, modelId: auto, input: {
+  "projectPath": "c:\\Users\\Luis Vasquez\\Downloads\\api",
+  "event": "precheckCompleted",
+  "status": "succeeded",
+  "phase": "precheck",
+  "details": {
+    "baseJdkVersion": "17",
+    "targetVersion": "25"
+  }
+}}).
+2026-05-20T05:37:19.497Z [INFO] [Tool.invoke] do invoke.
+2026-05-20T05:37:19.499Z [INFO] Project c:\Users\Luis Vasquez\Downloads\api is a maven project, try to get java version from pom.xml
+2026-05-20T05:37:19.501Z [INFO] [Tool.invoke]({result: {
+  "message": "Event 'precheckCompleted' reported!\nSession ID: 20260520053719,\nSession Dir: c:\\Users\\Luis Vasquez\\Downloads\\api\\.github\\java-upgrade\\20260520053719"
+}}).
+2026-05-20T05:37:19.502Z [INFO] ----------------------invoked appmod-report-event----------------------
+2026-05-20T05:37:19.504Z [INFO] Project java version: 17
+2026-05-20T05:37:19.504Z [INFO] Maven project detected.
+2026-05-20T05:37:19.504Z [INFO] Build tool type: mvnw
+2026-05-20T05:37:19.822Z [INFO] JDK: {
+  "name": "java",
+  "path": "C:\\Program Files\\Java\\jdk-17\\bin",
+  "version": "17"
+}
+2026-05-20T05:37:19.822Z [INFO] Build tool: {
+  "name": "mvnw",
+  "path": ".",
+  "version": ""
+}
+2026-05-20T05:37:19.822Z [INFO] Project config: {
+  "buildTool": {
+    "path": ".",
+    "name": "mvnw",
+    "version": ""
+  },
+  "jdk": {
+    "path": "C:\\Program Files\\Java\\jdk-17\\bin",
+    "name": "java",
+    "version": "17"
+  },
+  "name": "api",
+  "dir": "c:\\Users\\Luis Vasquez\\Downloads\\api"
+}
+2026-05-20T05:37:23.921Z [INFO] ---------------------prepare appmod-report-event----------------------
+2026-05-20T05:37:23.922Z [INFO] [Tool.prepareInvocation]({name: appmod-report-event, input: {
+  "sessionId": "20260520053719",
+  "projectPath": "c:\\Users\\Luis Vasquez\\Downloads\\api",
+  "event": "planGenerationStarted",
+  "status": "succeeded",
+  "phase": "plan"
+}}).
+2026-05-20T05:37:23.922Z [INFO] [Tool.prepareInvocation] do prepare invocation.
+2026-05-20T05:37:23.924Z [INFO] [Tool.prepareInvocation]({result: {
+  "invocationMessage": "Report upgrade event"
+}}).
+2026-05-20T05:37:23.925Z [INFO] ----------------------prepared appmod-report-event----------------------
+2026-05-20T05:37:24.015Z [INFO] ----------------------invoke appmod-report-event----------------------
+2026-05-20T05:37:24.016Z [INFO] [Tool.invoke]({name: appmod-report-event, modelId: auto, input: {
+  "sessionId": "20260520053719",
+  "projectPath": "c:\\Users\\Luis Vasquez\\Downloads\\api",
+  "event": "planGenerationStarted",
+  "status": "succeeded",
+  "phase": "plan"
+}}).
+2026-05-20T05:37:24.016Z [INFO] [Tool.invoke] do invoke.
+2026-05-20T05:37:24.017Z [INFO] [Tool.invoke]({result: {
+  "message": "Event 'planGenerationStarted' reported!\nSession ID: 20260520053719,\nSession Dir: c:\\Users\\Luis Vasquez\\Downloads\\api\\.github\\java-upgrade\\20260520053719"
+}}).
+2026-05-20T05:37:24.017Z [INFO] ----------------------invoked appmod-report-event----------------------
+2026-05-20T05:37:31.727Z [INFO] ---------------------prepare appmod-list-jdks----------------------
+2026-05-20T05:37:31.728Z [INFO] [Tool.prepareInvocation]({name: appmod-list-jdks, input: {
+  "sessionId": "20260520053719"
+}}).
+2026-05-20T05:37:31.729Z [INFO] [Tool.prepareInvocation] do prepare invocation.
+2026-05-20T05:37:31.730Z [INFO] [Tool.prepareInvocation]({result: {
+  "invocationMessage": "List jdks"
+}}).
+2026-05-20T05:37:31.731Z [INFO] ----------------------prepared appmod-list-jdks----------------------
+2026-05-20T05:37:31.816Z [INFO] ----------------------invoke appmod-list-jdks----------------------
+2026-05-20T05:37:31.817Z [INFO] [Tool.invoke]({name: appmod-list-jdks, modelId: auto, input: {
+  "sessionId": "20260520053719"
+}}).
+2026-05-20T05:37:31.817Z [INFO] [Tool.invoke] do invoke.
+2026-05-20T05:37:32.210Z [INFO] [Tool.invoke]({result: {
+  "message": "We found following jdks in your system:\n\n1. Java 1.8.0_112\n   📁 Path: C:\\Program Files\\Java\\jdk1.8.0_112\\bin\n   🏷️ Source: others\n\n2. Java 17.0.12\n   📁 Path: C:\\Program Files\\Java\\jdk-17\\bin\n   🏷️ Source: PATH,JAVA_HOME\n\nTotal: 2 JDK installation(s) found"
+}}).
+2026-05-20T05:37:32.210Z [INFO] ----------------------invoked appmod-list-jdks----------------------
+2026-05-20T05:37:33.957Z [INFO] ---------------------prepare appmod-list-mavens----------------------
+2026-05-20T05:37:33.958Z [INFO] [Tool.prepareInvocation]({name: appmod-list-mavens, input: {
+  "sessionId": "20260520053719"
+}}).
+2026-05-20T05:37:33.959Z [INFO] [Tool.prepareInvocation] do prepare invocation.
+2026-05-20T05:37:33.960Z [INFO] [Tool.prepareInvocation]({result: {
+  "invocationMessage": "List mavens"
+}}).
+2026-05-20T05:37:33.960Z [INFO] ----------------------prepared appmod-list-mavens----------------------
+2026-05-20T05:37:34.054Z [INFO] ----------------------invoke appmod-list-mavens----------------------
+2026-05-20T05:37:34.056Z [INFO] [Tool.invoke]({name: appmod-list-mavens, modelId: auto, input: {
+  "sessionId": "20260520053719"
+}}).
+2026-05-20T05:37:34.059Z [INFO] [Tool.invoke] do invoke.
+2026-05-20T05:37:34.095Z [INFO] [Tool.invoke]({result: {
+  "message": "We found following maven installations in your system:\n\n1. 📁 Path: C:\\apache-maven\\bin\n   🏷️ Source: MAVEN_HOME,PATH\n\nTotal: 1 Maven installation(s) found"
+}}).
+2026-05-20T05:37:34.095Z [INFO] ----------------------invoked appmod-list-mavens----------------------
+2026-05-20T05:38:15.607Z [INFO] ---------------------prepare appmod-report-event----------------------
+2026-05-20T05:38:15.607Z [INFO] [Tool.prepareInvocation]({name: appmod-report-event, input: {
+  "sessionId": "20260520053719",
+  "projectPath": "c:\\Users\\Luis Vasquez\\Downloads\\api",
+  "event": "planReviewed",
+  "status": "succeeded",
+  "phase": "plan"
+}}).
+2026-05-20T05:38:15.608Z [INFO] [Tool.prepareInvocation] do prepare invocation.
+2026-05-20T05:38:15.608Z [INFO] [Tool.prepareInvocation]({result: {
+  "invocationMessage": "Report upgrade event"
+}}).
+2026-05-20T05:38:15.608Z [INFO] ----------------------prepared appmod-report-event----------------------
+2026-05-20T05:38:15.652Z [INFO] ----------------------invoke appmod-report-event----------------------
+2026-05-20T05:38:15.653Z [INFO] [Tool.invoke]({name: appmod-report-event, modelId: auto, input: {
+  "sessionId": "20260520053719",
+  "projectPath": "c:\\Users\\Luis Vasquez\\Downloads\\api",
+  "event": "planReviewed",
+  "status": "succeeded",
+  "phase": "plan"
+}}).
+2026-05-20T05:38:15.653Z [INFO] [Tool.invoke] do invoke.
+2026-05-20T05:38:15.654Z [INFO] [Tool.invoke]({result: {
+  "message": "Event 'planReviewed' reported!\nSession ID: 20260520053719,\nSession Dir: c:\\Users\\Luis Vasquez\\Downloads\\api\\.github\\java-upgrade\\20260520053719"
+}}).
+2026-05-20T05:38:15.654Z [INFO] ----------------------invoked appmod-report-event----------------------
+2026-05-20T05:38:18.807Z [INFO] ---------------------prepare appmod-confirm-upgrade-plan----------------------
+2026-05-20T05:38:18.807Z [INFO] [Tool.prepareInvocation]({name: appmod-confirm-upgrade-plan, input: {
+  "sessionId": "20260520053719"
+}}).
+2026-05-20T05:38:18.807Z [INFO] [Tool.prepareInvocation] do prepare invocation.
+2026-05-20T05:38:18.808Z [INFO] [Tool.prepareInvocation]({result: {
+  "invocationMessage": "Review [upgrade plan](file:///c:/Users/Luis Vasquez/Downloads/api/.github/java-upgrade/20260520053719/plan.md)",
+  "confirmationMessages": {
+    "title": "Plan generated",
+    "message": "Please review the generated plan and make any necessary adjustments before proceeding. You can modify the generated [`plan.md`](file:///c:/Users/Luis Vasquez/Downloads/api/.github/java-upgrade/20260520053719/plan.md) directly."
+  }
+}}).
+2026-05-20T05:38:18.808Z [INFO] ----------------------prepared appmod-confirm-upgrade-plan----------------------

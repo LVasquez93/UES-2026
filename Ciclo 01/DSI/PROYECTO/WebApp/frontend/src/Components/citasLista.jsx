@@ -1,52 +1,30 @@
-import { useState, useEffect } from 'react';
 import { Table, Button, Spinner, Alert } from 'react-bootstrap';
-import { obtenerCitas } from '../services/citaService';
 
-export default function CitasLista({ onEditarSeleccionado }) {
-    const [citas, setCitas] = useState([]);
-    const [cargando, setCargando] = useState(true);
+// Función utilitaria pura local para evitar lógica compleja en el JSX
+const obtenerHoraFormateada = (isoString) => {
+    if (!isoString) return '';
+    return new Date(isoString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+};
 
-    useEffect(() => {
-        const cargarDatos = async () => {
-            try {
-                const datos = await obtenerCitas();
-                setCitas(datos);
-            } catch (error) {
-                console.error("Error", error);
-            } finally {
-                setCargando(false);
-            }
-        };
-        cargarDatos();
-    }, []);
-
-    const manejarCancelar = async (id) => {
-        const motivo = prompt("Ingrese el motivo de la cancelación:");
-        if (motivo) {
-            try {
-                await cancelarCitaAPI(id, motivo);
-                alert("Cita cancelada");
-                // Aquí llamamos a la función que recarga la lista
-                cargarDatos();
-            } catch (e) {
-                alert("No se pudo cancelar");
-            }
-        }
-    };
-
+export default function CitasLista({ citas, cargando, onCancelar, onEditarSeleccionado }) {
+    
     if (cargando) {
-        return <Spinner animation="border" variant="primary" />;
+        return (
+            <div className="text-center p-5">
+                <Spinner animation="border" variant="primary" />
+                <p className="text-muted mt-2">Cargando agenda médica...</p>
+            </div>
+        );
     }
 
     if (citas.length === 0) {
-        return <Alert variant="info">No hay citas programadas para hoy.</Alert>;
+        return <Alert variant="info" className="my-3">No hay citas programadas en el sistema.</Alert>;
     }
 
     return (
         <>
             <h4 className="mb-3">Agenda Odontológica</h4>
-            {/* Table de Bootstrap: rayada, con bordes y efecto hover */}
-            <Table striped bordered hover responsive size="sm">
+            <Table striped bordered hover responsive size="sm" className="align-middle">
                 <thead className="table-dark">
                     <tr>
                         <th>Fecha</th>
@@ -61,26 +39,32 @@ export default function CitasLista({ onEditarSeleccionado }) {
                     {citas.map((cita) => (
                         <tr key={cita.idCitas}>
                             <td>{cita.fechaCita}</td>
-                            <td>{new Date(cita.horaInicioCita).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
-                            <td>{new Date(cita.horaFinCita).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+                            <td>{obtenerHoraFormateada(cita.horaInicioCita)}</td>
+                            <td>{obtenerHoraFormateada(cita.horaFinCita)}</td>
                             <td>{cita.nombreCompletoPaciente}</td>
                             <td>
-                                {/* Un pequeño detalle visual para el estado */}
-                                <span className={`badge ${cita.estadoCita === 'PROGRAMADA' ? 'bg-success' : 'bg-secondary'}`}>
+                                <span className={`badge ${
+                                    cita.estadoCita === 'PROGRAMADA' ? 'bg-success' : 
+                                    cita.estadoCita === 'CANCELADA' ? 'bg-danger' : 'bg-secondary'
+                                }`}>
                                     {cita.estadoCita}
                                 </span>
                             </td>
                             <td>
-                                <Button
-                                    variant="danger" size="sm" className="me-2"
-                                    onClick={() => manejarCancelar(cita.idCitas)} // <-- LLAMADA A LA FUNCIÓN
-                                >
-                                    Cancelar
-                                </Button>
+                                {cita.estadoCita !== 'CANCELADA' && (
+                                    <Button
+                                        variant="danger" 
+                                        size="sm" 
+                                        className="me-2"
+                                        onClick={() => onCancelar(cita.idCitas)}
+                                    >
+                                        Cancelar
+                                    </Button>
+                                )}
                                 <Button
                                     variant="warning"
                                     size="sm"
-                                    onClick={() => onEditarSeleccionado(cita)} // <-- Al hacer clic, envía la cita al padre App.jsx
+                                    onClick={() => onEditarSeleccionado(cita)}
                                 >
                                     Modificar
                                 </Button>

@@ -2,16 +2,23 @@ import { useState } from 'react';
 import { Container, Row, Col, Navbar } from 'react-bootstrap';
 import CitasLista from './components/CitasLista';
 import FormularioCita from './components/FormularioCita';
+import { useCitas } from './hooks/useCitas';
 
 export default function App() {
-  const [refresco, setRefresco] = useState(0);
-  // Nuevo estado para guardar temporalmente la cita seleccionada para edición
   const [citaAEditar, setCitaAEditar] = useState(null);
+  
+  // Consumimos el estado y funciones globales de nuestro custom hook
+  const { 
+    citas, 
+    cargando, 
+    agendarNuevaCita, 
+    modificarCita, 
+    cancelarCita 
+  } = useCitas();
 
-  const handleCitaCreadaOActualizada = () => {
-    setRefresco(prev => prev + 1);
-    setCitaAEditar(null); // Limpiamos el modo edición
-  }
+  const handleCitaGuardada = () => {
+    setCitaAEditar(null); // Desactivar modo edición de manera limpia
+  };
 
   return (
     <div style={{ backgroundColor: '#f4f6f9', minHeight: '100vh' }}>
@@ -26,15 +33,22 @@ export default function App() {
               <h4>{citaAEditar ? "Modificar Cita" : "Agendar Nueva Cita"}</h4>
               <hr />
               <FormularioCita
-                onCitaCreada={handleCitaCreadaOActualizada}
                 citaAEditar={citaAEditar}
+                onCitaGuardada={handleCitaGuardada}
+                agendarNuevaCita={agendarNuevaCita}
+                modificarCita={modificarCita}
               />
             </div>
           </Col>
 
           <Col md={8}>
             <div className="bg-white p-4 rounded shadow-sm">
-              <CitasLista key={refresco} onEditarSeleccionado={setCitaAEditar} />
+              <CitasLista 
+                citas={citas} 
+                cargando={cargando} 
+                onCancelar={cancelarCita} 
+                onEditarSeleccionado={setCitaAEditar} 
+              />
             </div>
           </Col>
         </Row>

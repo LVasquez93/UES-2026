@@ -1,13 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Form, Button, Row, Col, InputGroup } from 'react-bootstrap';
-import { obtenerPacientes, obtenerOdontologos, crearCita } from '../services/citaService';
-// NOTA: Asegúrate de importar también actualizarCitaAPI si la vas a usar en el handleSubmit
-// import { actualizarCitaAPI } from '../services/citaService';
+import { Form, Button, Row, Col, InputGroup, Spinner } from 'react-bootstrap';
+import { useCatalogos } from '../hooks/useCatalogos';
 
-// CORRECCIÓN 1: Recibir citaAEditar
-export default function FormularioCita({ onCitaCreada, citaAEditar }) {
-    const [pacientes, setPacientes] = useState([]);
-    const [odontologos, setOdontologos] = useState([]);
+export default function FormularioCita({ citaAEditar, onCitaGuardada, agendarNuevaCita, modificarCita }) {
+    const { pacientes, odontologos, cargandoCatalogos } = useCatalogos();
 
     const [formData, setFormData] = useState({
         idPaciente: '',
@@ -18,24 +14,11 @@ export default function FormularioCita({ onCitaCreada, citaAEditar }) {
         estadoCita: 'PROGRAMADA'
     });
 
-    useEffect(() => {
-        const cargarCatalogos = async () => {
-            try {
-                const p = await obtenerPacientes();
-                const o = await obtenerOdontologos();
-                setPacientes(p);
-                setOdontologos(o);
-            } catch (e) {
-                console.error("Error cargando catálogos", e);
-            }
-        };
-        cargarCatalogos();
-    }, []);
-
+    // Sincronización limpia con el modo edición
     useEffect(() => {
         if (citaAEditar) {
-            const horaInicio = citaAEditar.horaInicioCita.split('T')[1].substring(0, 5);
-            const horaFin = citaAEditar.horaFinCita.split('T')[1].substring(0, 5);
+            const horaInicio = citaAEditar.horaInicioCita.split('T')[1]?.substring(0, 5) || '';
+            const horaFin = citaAEditar.horaFinCita.split('T')[1]?.substring(0, 5) || '';
 
             setFormData({
                 idPaciente: citaAEditar.idPaciente,
@@ -46,29 +29,40 @@ export default function FormularioCita({ onCitaCreada, citaAEditar }) {
                 estadoCita: citaAEditar.estadoCita
             });
         } else {
-            setFormData({ idPaciente: '', idOdontologo: '', fechaCita: '', horaInicioCita: '', horaFinCita: '', estadoCita: 'PROGRAMADA' });
+            setFormData({ 
+                idPaciente: '', 
+                idOdontologo: '', 
+                fechaCita: '', 
+                horaInicioCita: '', 
+                horaFinCita: '', 
+                estadoCita: 'PROGRAMADA' 
+            });
         }
     }, [citaAEditar]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            const request = {
-                ...formData,
-                horaInicioCita: `${formData.fechaCita}T${formData.horaInicioCita}:00`,
-                horaFinCita: `${formData.fechaCita}T${formData.horaFinCita}:00`
-            };
+        let exito = false;
 
-            if (citaAEditar) {
-                // await actualizarCitaAPI(citaAEditar.idCitas, request);
-                alert("Cita modificada con éxito (Descomenta la API para que funcione)");
-            } else {
-                await crearCita(request);
-                alert("Cita agendada con éxito");
-            }
-            onCitaCreada();
-        } catch (err) { alert("Error al procesar la operación"); }
+        if (citaAEditar) {
+            exito = await modificarCita(citaAEditar.idCitas, formData);
+        } else {
+            exito = await agendarNuevaCita(formData);
+        }
+
+        if (exito) {
+            onCitaGuardada(); // Notificar al padre para limpiar estados
+        }
     };
+
+    if (cargandoCatalogos) {
+        return (
+            <div className="text-center p-4">
+                <Spinner animation="border" size="sm" variant="primary" />
+                <span className="ms-2 text-muted">Cargando doctores y pacientes...</span>
+            </div>
+        );
+    }
 
     return (
         <Form onSubmit={handleSubmit}>
@@ -81,9 +75,13 @@ export default function FormularioCita({ onCitaCreada, citaAEditar }) {
                         onChange={(e) => setFormData({ ...formData, idPaciente: e.target.value })}
                     >
                         <option value="">Seleccione un paciente...</option>
-                        {pacientes.map(p => <option key={p.idPaciente} value={p.idPaciente}>{p.nombrePaciente} {p.apellidoPaciente}</option>)}
+                        {pacientes.map(p => (
+                            <option key={p.idPaciente} value={p.idPaciente}>
+                                {p.nombrePaciente} {p.apellidoPaciente}
+                            </option>
+                        ))}
                     </Form.Select>
-                    <Button variant="outline-primary" onClick={() => alert("Aquí abriríamos el Modal de nuevo paciente")}>
+                    <Button variant="outline-primary" onClick={() => alert("Abrir modal de nuevo paciente")}>
                         +
                     </Button>
                 </InputGroup>
@@ -110,7 +108,7 @@ export default function FormularioCita({ onCitaCreada, citaAEditar }) {
                 <Form.Control
                     type="date"
                     required
-                    value={formData.fechaCita} // CORRECCIÓN 2: Atributo value
+                    value={formData.fechaCita}
                     onChange={(e) => setFormData({ ...formData, fechaCita: e.target.value })}
                 />
             </Form.Group>
@@ -122,7 +120,7 @@ export default function FormularioCita({ onCitaCreada, citaAEditar }) {
                         <Form.Control
                             type="time"
                             required
-                            value={formData.horaInicioCita} // CORRECCIÓN 2: Atributo value
+                            value={formData.horaInicioCita}
                             onChange={(e) => setFormData({ ...formData, horaInicioCita: e.target.value })}
                         />
                     </Form.Group>
@@ -133,14 +131,13 @@ export default function FormularioCita({ onCitaCreada, citaAEditar }) {
                         <Form.Control
                             type="time"
                             required
-                            value={formData.horaFinCita} // CORRECCIÓN 2: Atributo value
+                            value={formData.horaFinCita}
                             onChange={(e) => setFormData({ ...formData, horaFinCita: e.target.value })}
                         />
                     </Form.Group>
                 </Col>
             </Row>
 
-            {/* CORRECCIÓN 3: Eliminado el botón duplicado */}
             <Button variant={citaAEditar ? "warning" : "primary"} type="submit" className="w-100 mt-3">
                 {citaAEditar ? "Guardar Cambios" : "Agendar Cita"}
             </Button>

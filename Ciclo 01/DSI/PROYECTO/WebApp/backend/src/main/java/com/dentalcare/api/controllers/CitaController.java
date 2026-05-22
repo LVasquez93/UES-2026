@@ -46,7 +46,7 @@ public class CitaController {
     }
 
     /**
-     * EGISTRAR UNA NUEVA CITA
+     * REGISTRAR UNA NUEVA CITA
      * POST http://localhost:8080/api/citas
      */
     // Este método maneja las solicitudes POST a la ruta "/api/citas" para crear una

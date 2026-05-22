@@ -9,7 +9,7 @@ const api = axios.create({
         'Content-Type': 'application/json' // Configuramos el tipo de contenido para las solicitudes
     }
 });
-// Se pueden agregar interceptores aquí si necesitas manejar tokens de autenticación o errores globales
+// Se pueden agregar interceptores aquí si se necesita manejar tokens de autenticación o errores globales
 
 //Exportamos la instancia de Axios para que pueda ser utilizada en otros archivos de la aplicación, 
 //como en los servicios o componentes de React, facilitando así la comunicación con el backend.
