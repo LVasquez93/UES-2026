@@ -4,71 +4,108 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../estilos/Login.css';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [identifier, setIdentifier] = useState('');
+  const [password, setPassword]     = useState('');
+  const [error, setError]           = useState('');
+  const [isLoading, setIsLoading]   = useState(false);
   const navigate = useNavigate();
 
-const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    
-    // Aquí es donde harías la petición POST a tu backend.
-    // Simulamos que el servidor nos respondió correctamente y nos dio un Token:
-    const fakeToken = "jwt-super-seguro-123456789";
-    
-    // Guardamos la credencial en el LocalStorage del navegador
-    localStorage.setItem('authToken', fakeToken);
-    
-    console.log("Iniciando sesión con:", email);
-    // Ahora sí, lo enviamos al dashboard
-    navigate('/dashboard'); 
+    setError('');
+    setIsLoading(true);
+
+    try {
+      // Peticion POST al endpoint de autenticacion del backend Spring Boot
+      const response = await fetch('http://localhost:8080/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: identifier,
+          password: password,
+        }),
+      });
+
+      if (!response.ok) {
+        // El backend retorna 401 si las credenciales son incorrectas
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Credenciales incorrectas.');
+      }
+
+      const data = await response.json();
+
+      // Guardamos el JWT y los datos del usuario en localStorage
+      // En produccion, considera guardar el token en una cookie HttpOnly
+      localStorage.setItem('authToken', data.token);
+      localStorage.setItem('userRole', data.rol);
+      localStorage.setItem('userName', data.nombreCompleto);
+
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.message || 'Error de conexion con el servidor.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="login-container">
-      {/* SECCIÓN IZQUIERDA: Branding e Imagen */}
+      {/* Seccion izquierda: branding */}
       <div className="login-branding">
         <div className="branding-content">
           <h1 className="logo-text">DentalCare.</h1>
-          <p className="branding-subtitle">Sistema integral de gestión clínica y odontograma digital.</p>
+          <p className="branding-subtitle">
+            Sistema integral de gestion clinica y odontograma digital.
+          </p>
         </div>
         <div className="branding-overlay"></div>
       </div>
 
-      {/* SECCIÓN DERECHA: Formulario */}
+      {/* Seccion derecha: formulario */}
       <div className="login-form-section">
         <div className="form-wrapper">
           <div className="text-center mb-5">
-            <h2 className="fw-bold text-main">¡Bienvenido de nuevo! 👋</h2>
-            <p className="text-muted">Ingresa tus credenciales para acceder a tu panel.</p>
+            <h2 className="fw-bold text-main">Bienvenido de nuevo</h2>
+            <p className="text-muted">Ingresa tus credenciales para acceder al panel.</p>
           </div>
 
-          <form onSubmit={handleLogin}>
+          {/* Bloque de error visible solo cuando existe un mensaje */}
+          {error && (
+            <div className="alert alert-danger d-flex align-items-center gap-2 mb-4" role="alert">
+              <i className="bi bi-exclamation-triangle-fill"></i>
+              <span>{error}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleLogin} noValidate>
             <div className="mb-4">
-              <label className="form-label-custom">Correo electrónico o Usuario</label>
+              <label className="form-label-custom">Correo electronico o Usuario</label>
               <div className="input-group-custom">
                 <i className="bi bi-person text-muted"></i>
-                <input 
-                  type="text" 
-                  className="form-control-custom" 
+                <input
+                  type="text"
+                  className="form-control-custom"
                   placeholder="ejemplo@dentalcare.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required 
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
+                  disabled={isLoading}
+                  required
                 />
               </div>
             </div>
 
             <div className="mb-4">
-              <label className="form-label-custom">Contraseña</label>
+              <label className="form-label-custom">Contrasena</label>
               <div className="input-group-custom">
                 <i className="bi bi-lock text-muted"></i>
-                <input 
-                  type="password" 
-                  className="form-control-custom" 
-                  placeholder="••••••••"
+                <input
+                  type="password"
+                  className="form-control-custom"
+                  placeholder="contrasena"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  required 
+                  disabled={isLoading}
+                  required
                 />
               </div>
             </div>
@@ -80,17 +117,31 @@ const handleLogin = (e) => {
                   Recordarme
                 </label>
               </div>
-              <a href="#" className="forgot-password-link small">¿Olvidaste tu contraseña?</a>
+              <a href="#" className="forgot-password-link small">
+                Olvidaste tu contrasena?
+              </a>
             </div>
 
-            <button type="submit" className="btn-login w-100">
-              Ingresar al Sistema
+            {/* El boton se deshabilita mientras la peticion esta en curso */}
+            <button type="submit" className="btn-login w-100" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <span
+                    className="spinner-border spinner-border-sm me-2"
+                    role="status"
+                    aria-hidden="true"
+                  ></span>
+                  Verificando...
+                </>
+              ) : (
+                'Ingresar al Sistema'
+              )}
             </button>
           </form>
-          
+
           <div className="text-center mt-4">
             <small className="text-muted">
-              ¿Problemas de acceso? Contacta al administrador del sistema.
+              Problemas de acceso? Contacta al administrador del sistema.
             </small>
           </div>
         </div>

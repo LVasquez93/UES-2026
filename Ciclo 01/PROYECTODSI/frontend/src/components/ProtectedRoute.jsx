@@ -1,18 +1,34 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 
-const ProtectedRoute = ({ children }) => {
-  // Aquí buscamos si existe un "token" en el almacenamiento del navegador.
-  // Más adelante, cuando conectes tu backend (Spring Boot), aquí validarás un JWT real.
-  const isAuthenticated = localStorage.getItem('authToken');
+/**
+ * Decodifica el payload de un JWT sin libreria externa.
+ * No valida la firma (eso es tarea del servidor). Solo verifica expiracion en cliente.
+ */
+const isTokenValid = (token) => {
+  if (!token) return false;
+  try {
+    // El JWT tiene 3 partes separadas por puntos: header.payload.signature
+    const payloadBase64 = token.split('.')[1];
+    const payload = JSON.parse(atob(payloadBase64));
+    // "exp" esta en segundos Unix; Date.now() esta en milisegundos
+    return payload.exp * 1000 > Date.now();
+  } catch {
+    // Si el token esta malformado, lo consideramos invalido
+    return false;
+  }
+};
 
-  if (!isAuthenticated) {
-    // Si no está autenticado, lo pateamos a la ruta raíz (Login)
-    // El "replace" borra el historial para que el usuario no pueda usar el botón "Atrás" del navegador para burlar la seguridad.
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem('authToken');
+  const authenticated = isTokenValid(token);
+
+  if (!authenticated) {
+    // Limpiamos storage para evitar datos obsoletos
+    localStorage.clear();
     return <Navigate to="/" replace />;
   }
 
-  // Si está autenticado, lo dejamos pasar y renderizamos el componente hijo
   return children;
 };
 

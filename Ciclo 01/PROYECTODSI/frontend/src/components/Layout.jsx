@@ -1,11 +1,12 @@
 import React from 'react';
-import { useNavigate, Outlet, useLocation } from 'react-router-dom';
-import 'bootstrap-icons/font/bootstrap-icons.css';
-// Aquí deberías importar el CSS que contiene los estilos del sidebar y header que ya teníamos
+import { useNavigate, Outlet, useLocation } from 'react-router-dom'; //
+import 'bootstrap-icons/font/bootstrap-icons.css'; // estilos de bootstrap en node-bootstrap
+
 
 const Layout = () => {
   const navigate = useNavigate();
-  const location = useLocation(); // Para saber en qué ruta estamos y pintar el ícono activo
+  // Para saber en qué ruta estamos y pintar el ícono activo
+  const location = useLocation(); 
 
   const handleLogout = () => {
     localStorage.removeItem('authToken');
@@ -26,8 +27,6 @@ const Layout = () => {
 
           <i className={`bi bi-calendar3 ${location.pathname === '/agenda' ? 'active' : ''}`} onClick={() => navigate('/agenda')} title="Agenda"></i>
 
-          {/* Ícono para la Consulta Activa */}
-          {/* <i className={`bi bi-heart-pulse ${location.pathname === '/consulta' ? 'active' : ''}`} onClick={() => navigate('/consulta')} title="Consulta Activa"></i> */}
 
           {/* Ícono para Gestión de Usuarios / Personal */}
           <i className={`bi bi-person-badge ${location.pathname === '/usuarios' ? 'active' : ''}`} onClick={() => navigate('/usuarios')} title="Personal de Clínica"></i>
