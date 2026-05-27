@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../estilos/Login.css';
 
+/** Esta Pantalla es el login del sistema, donde el usuario ingresa su correo electronico o nombre de usuario y su contraseña para autenticarse. Al hacer click en "Ingresar al Sistema" se hace una peticion POST al backend Spring Boot para validar las credenciales, si son correctas se guarda el JWT y los datos del usuario en localStorage y se redirige al dashboard principal. Si las credenciales son incorrectas, se muestra un mensaje de error debajo del formulario.*/
+
 const Login = () => {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword]     = useState('');

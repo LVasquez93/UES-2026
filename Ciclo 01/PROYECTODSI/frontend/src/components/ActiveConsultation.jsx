@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Odontogram } from 'react-odontogram';
 import '../estilos/DentalDashboard.css';
 
+/** Esta Pantalla se muestra cuando el odontologo hace click en "Iniciar Consulta" desde el Dashboard, es el espacio de trabajo principal durante la consulta, donde se muestra un banner con el estado de la consulta (en curso, finalizada, etc) y un indicador de pasos (revisión, tratamiento, diagnóstico). El odontologo puede ir avanzando por cada paso y registrar los hallazgos en un textarea o directamente en el odontograma. Al finalizar la consulta se muestra una pantalla de resumen con la opción de imprimir una receta o volver al dashboard.*/
+
 const ActiveConsultation = () => {
   const [step, setStep] = useState(1); // 1: Revisión, 2: Odontograma, 3: Cierre
   const [notas, setNotas] = useState('');

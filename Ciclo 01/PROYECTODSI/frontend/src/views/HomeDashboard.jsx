@@ -3,9 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../estilos/HomeDashboard.css';
 
+/** Esta Pantalla es el "home" del usuario al ingresar al sistema, es un dashboard de bienvenida que muestra un resumen de la agenda del día, accesos rápidos a las funciones principales (registrar paciente, ver agenda, odontograma, presupuestos) y widgets con estadísticas rápidas (citas del día, pacientes atendidos esta semana, etc). Desde aquí el usuario puede navegar a cualquier sección del sistema.*/
 
 const HomeDashboard = () => {
   const navigate = useNavigate();
+  // Leemos los datos del usuario que guardo Login.jsx en localStorage al autenticarse
+  const userName     = localStorage.getItem('userName')  || 'Usuario';
+  const userRole     = localStorage.getItem('userRole')  || '';
+  // Generamos las iniciales a partir del nombre completo (ej. "Juan Perez" -> "JP")
+
+  const today = new Date().toLocaleDateString('es-SV', {
+  weekday: 'long', day: 'numeric', month: 'long'
+});
 
   return (
     <div className="app-container">
@@ -15,8 +24,8 @@ const HomeDashboard = () => {
         {/* CUERPO DEL DASHBOARD */}
         <div className="dashboard-body">
           <div className="welcome-section mb-4">
-            <h2 className="fw-bold" style={{ color: 'var(--text-main)' }}>¡Hola, Dr. Arriaza! 👋</h2>
-            <p className="text-muted">Aquí tienes el resumen de tu clínica para hoy, 25 de mayo.</p>
+            <h2 className="fw-bold" style={{ color: 'var(--text-main)' }}>¡Hola, {userName}! 👋</h2>
+            <p className="text-muted">Aquí tienes el resumen de tu clínica para hoy {today}.</p>
           </div>
 
           {/* ACCESOS RÁPIDOS (Tarjetas de navegación) */}

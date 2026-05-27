@@ -4,6 +4,8 @@ import 'react-odontogram/style.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../estilos/DentalDashboard.css';
 
+/** Esta Pantalla se muestra cuando el odontologo hace click en "Iniciar Consulta" desde el Dashboard, es el espacio de trabajo principal durante la consulta, donde se muestra un banner con el estado de la consulta (en curso, finalizada, etc) y un indicador de pasos (revisión, tratamiento, diagnóstico). El odontologo puede ir avanzando por cada paso y registrar los hallazgos en un textarea o directamente en el odontograma. Al finalizar la consulta se muestra una pantalla de resumen con la opción de imprimir una receta o volver al dashboard.*/
+
 const DentalDashboard = () => {
   const [activeTab, setActiveTab] = useState('historial');
   const [selectedTeeth, setSelectedTeeth] = useState([]);
@@ -16,6 +18,11 @@ const DentalDashboard = () => {
 
   const piecesText = selectedTeeth.map(t => t.notations.fdi).join(', ');
 
+  // Leemos los datos del usuario que guardo Login.jsx en localStorage al autenticarse
+  const userName     = localStorage.getItem('userName')  || 'Usuario';
+  const userRole     = localStorage.getItem('userRole')  || '';
+  // Generamos las iniciales a partir del nombre completo (ej. "Juan Perez" -> "JP")
+  
   return (
     <div className="d-flex flex-column h-100 p-4" style={{ backgroundColor: 'var(--bg-app)' }}>
 

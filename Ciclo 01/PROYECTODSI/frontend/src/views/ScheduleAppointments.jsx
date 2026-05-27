@@ -5,6 +5,8 @@ import 'react-calendar/dist/Calendar.css'; // Estilos base
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../estilos/ScheduleAppointments.css';
 
+/** Esta Pantalla es el modulo de gestion de citas, donde el usuario puede ver un calendario para seleccionar una fecha y un listado de citas programadas para esa fecha. El usuario puede alternar entre vista de día (lista simple) y vista de semana (agrupada por días). Al hacer click en una cita, se muestran opciones para editar, cancelar o notificar al paciente. Al crear o editar una cita, se muestra un formulario con campos para seleccionar paciente, hora y tratamiento. Al cancelar o reprogramar una cita, se muestra una confirmacion con SweetAlert2 para evitar acciones accidentales.*/
+
 const ScheduleAppointments = () => {
   const [date, setDate] = useState(new Date());
   const [showForm, setShowForm] = useState(false);

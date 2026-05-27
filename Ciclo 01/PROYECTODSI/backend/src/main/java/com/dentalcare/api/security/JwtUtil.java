@@ -11,32 +11,7 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Date;
 
-/**
- * Componente utilitario para la generacion y validacion de JWT.
- *
- * Dependencia requerida en pom.xml:
- *   <dependency>
- *     <groupId>io.jsonwebtoken</groupId>
- *     <artifactId>jjwt-api</artifactId>
- *     <version>0.11.5</version>
- *   </dependency>
- *   <dependency>
- *     <groupId>io.jsonwebtoken</groupId>
- *     <artifactId>jjwt-impl</artifactId>
- *     <version>0.11.5</version>
- *     <scope>runtime</scope>
- *   </dependency>
- *   <dependency>
- *     <groupId>io.jsonwebtoken</groupId>
- *     <artifactId>jjwt-jackson</artifactId>
- *     <version>0.11.5</version>
- *     <scope>runtime</scope>
- *   </dependency>
- *
- * Propiedades requeridas en application.properties:
- *   jwt.secret=clave-secreta-larga-de-minimo-32-caracteres-para-HS256
- *   jwt.expiration.ms=86400000
- */
+
 @Component
 public class JwtUtil {
 
@@ -44,7 +19,7 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secret;
 
-    // Tiempo de expiracion en milisegundos (por defecto 24 horas)
+    // Tiempo de expiracion en milisegundos (1 hora)
     @Value("${jwt.expiration.ms}")
     private long expirationMs;
 
