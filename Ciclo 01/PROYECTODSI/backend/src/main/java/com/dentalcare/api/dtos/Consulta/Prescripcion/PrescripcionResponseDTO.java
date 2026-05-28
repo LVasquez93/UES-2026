@@ -2,6 +2,7 @@ package com.dentalcare.api.dtos.Consulta.Prescripcion;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,6 +27,7 @@ public class PrescripcionResponseDTO {
      */
     @Data
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class DetallePrescripcionResponseDTO {
         private Integer idDetalle;
         private Integer idMedicamento;
@@ -36,5 +38,7 @@ public class PrescripcionResponseDTO {
         private String frecuencia;
         private Integer duracion;
         private String indicaciones;
+        
+        private Integer idPlanTratamiento;
     }
 }

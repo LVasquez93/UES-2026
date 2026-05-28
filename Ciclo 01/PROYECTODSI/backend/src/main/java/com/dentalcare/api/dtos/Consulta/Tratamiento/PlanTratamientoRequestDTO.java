@@ -22,4 +22,6 @@ public class PlanTratamientoRequestDTO {
 
     // Estado inicial del plan: por defecto PENDIENTE si no se envia
     private String estadoPlan;
+
+    private Float precioFloat;
 }

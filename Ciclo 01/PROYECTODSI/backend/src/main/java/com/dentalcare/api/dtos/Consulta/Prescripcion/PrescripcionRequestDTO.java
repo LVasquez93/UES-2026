@@ -40,5 +40,7 @@ public class PrescripcionRequestDTO {
 
         @NotNull(message = "Las indicaciones son obligatorias.")
         private String indicaciones;
+
+        private Integer idPlanTratamiento;
     }
 }

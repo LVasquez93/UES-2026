@@ -241,3 +241,10 @@
 .receta-item:hover {
   border-color: var(--primary-color) !important;
 }
+
+.hallazgo-estado.pendiente   { background: #fef3c7; color: #92400e; }
+.hallazgo-estado.programado  { background: #e0e7ff; color: #3730a3; } /* Azul claro */
+.hallazgo-estado.en_progreso { background: #dbeafe; color: #1e40af; } /* Azul más fuerte */
+.hallazgo-estado.completado  { background: #dcfce7; color: #166534; } /* Verde */
+.hallazgo-estado.cancelado   { background: #fee2e2; color: #991b1b; } /* Rojo */
+.hallazgo-estado.otro        { background: #f3f4f6; color: #374151; } /* Gris */

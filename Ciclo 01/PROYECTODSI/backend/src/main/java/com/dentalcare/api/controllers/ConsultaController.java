@@ -107,6 +107,16 @@ public class ConsultaController {
         }
     }
 
+    @PatchMapping("/hallazgo/{id}/estado")
+public ResponseEntity<?> actualizarEstadoHallazgo(
+        @PathVariable Integer id, 
+        @RequestBody Map<String, String> payload) {
+    
+    String nuevoEstado = payload.get("estado");
+    consultaService.actualizarEstadoHallazgo(id, nuevoEstado);
+    return ResponseEntity.ok().build();
+}
+
     // --- PRESCRIPCION (PASO 3) ---
 
     // POST /api/consulta/prescripcion

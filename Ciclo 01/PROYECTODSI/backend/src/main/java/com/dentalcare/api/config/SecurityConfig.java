@@ -45,7 +45,7 @@ public class SecurityConfig {
      * - Sesiones deshabilitadas: STATELESS porque el estado vive en el JWT del cliente
      * - Todos los endpoints publicos temporalmente para probar el login
      *
-     * SIGUIENTE PASO - Para proteger rutas privadas, agregar el filtro JWT:
+     * Para proteger rutas privadas, agregar el filtro JWT:
      *   .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
      *   .authorizeHttpRequests(auth -> auth
      *       .requestMatchers("/api/auth/**").permitAll()
@@ -55,6 +55,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+            // .cors(Customizer.withDefaults())
+
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)

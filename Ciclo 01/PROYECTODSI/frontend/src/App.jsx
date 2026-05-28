@@ -8,7 +8,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
 import UserManagement from "./views/UserManagement";
 import ConsultaIndex from "./views/ConsultaIndex";
-import ActiveConsultation from "./views/ActiveConsultation";
+import ActiveConsultation from "./views/DentalDashboard";
 
 function App() {
   return (
@@ -26,7 +26,7 @@ function App() {
           }
         >
           <Route path="/dashboard"   element={<HomeDashboard />} />
-          <Route path="/odontograma" element={<DentalDashboard />} />
+          {/* <Route path="/odontograma" element={<DentalDashboard />} /> */}
           <Route path="/agenda"      element={<ScheduleAppointments />} />
           <Route path="/pacientes"   element={<PatientManagement />} />
           <Route path="/usuarios"    element={<UserManagement />} />
@@ -36,7 +36,7 @@ function App() {
 
           {/* Consulta activa: recibe el ID de la cita como parametro de URL
               No se puede navegar aqui sin un citaId valido */}
-          <Route path="/consulta/:citaId" element={<ActiveConsultation />} />
+          <Route path="/consulta/:citaId" element={<DentalDashboard />} />
         </Route>
       </Routes>
     </BrowserRouter>

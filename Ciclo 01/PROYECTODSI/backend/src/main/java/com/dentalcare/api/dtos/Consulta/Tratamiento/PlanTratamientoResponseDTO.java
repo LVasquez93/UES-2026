@@ -19,4 +19,5 @@ public class PlanTratamientoResponseDTO {
     private Integer idTratamiento;
     private String nombreTratamiento;
     private String descripcionTratamiento;
+    private Float precioFloat;
 }
