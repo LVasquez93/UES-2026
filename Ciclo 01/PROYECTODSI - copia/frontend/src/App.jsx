@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./views/Login";
 import HomeDashboard from "./views/HomeDashboard";
-import DentalDashboard from "./views/DentalDashboard";
+import DentalDashboard from "./views/ActiveConsultation";
 import ScheduleAppointments from "./views/ScheduleAppointments";
 import PatientManagement from "./views/PatientManagement";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -35,7 +35,7 @@ function App() {
 
           {/* Consulta activa: recibe el ID de la cita como parametro de URL
               No se puede navegar aqui sin un citaId valido */}
-          <Route path="/consulta/:citaId" element={<DentalDashboard />} />
+          <Route path="/consulta/:citaId" element={<ActiveConsultation/>} />
         </Route>
       </Routes>
     </BrowserRouter>
