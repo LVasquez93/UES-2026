@@ -1,40 +1,59 @@
 import React from 'react';
+import Button from './ui/Button';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 /**
  * Paso 4: Pantalla de cierre de consulta.
- * Muestra un resumen de lo registrado y opciones para imprimir o volver.
+ * Muestra resumen y opciones para imprimir o volver.
  */
-const StepCierre = ({ cita, hallazgos, prescripcion, onVolver }) => {
-  return (
-    <div
-      className="workspace-card mt-3 animate__animated animate__fadeIn"
-      style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-    >
-      <div className="text-center py-5">
-        <i className="bi bi-check-circle-fill text-success" style={{ fontSize: '5rem' }} />
-        <h2 className="fw-bold mt-4">Consulta Finalizada</h2>
-        <p className="text-muted">
-          El diagnóstico, hallazgos y prescripción han sido guardados en el expediente de{' '}
-          <strong>{cita.nombreCompletoPaciente}</strong>.
-        </p>
+const StepCierre = ({ cita, hallazgos, prescripcion, onVolver }) => (
+  <div className="bg-white rounded-2xl border border-slate-200 shadow-card mt-4
+                  flex-1 flex items-center justify-center animate-fade-in">
+    <div className="text-center py-12 px-8 max-w-md">
 
-        {/* Resumen de lo registrado */}
-        <div className="d-flex justify-content-center gap-3 mt-3 mb-5">
-          <div className="summary-pill blue">{hallazgos.length} Hallazgos</div>
-          <div className="summary-pill green">{prescripcion?.detalles?.length || 0} Medicamentos</div>
+      {/* Ícono de éxito */}
+      <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center
+                      mx-auto mb-6">
+        <i className="bi bi-check-circle-fill text-emerald-500 text-5xl" />
+      </div>
+
+      <h2 className="text-2xl font-bold text-slate-800 mb-2">Consulta Finalizada</h2>
+      <p className="text-slate-500 text-sm mb-6">
+        El diagnóstico, hallazgos y prescripción han sido guardados en el expediente de{' '}
+        <strong className="text-slate-700">{cita.nombreCompletoPaciente}</strong>.
+      </p>
+
+      {/* Resumen de lo registrado */}
+      <div className="flex items-center justify-center gap-3 mb-8">
+        <div className="flex items-center gap-1.5 px-4 py-2 bg-sky-50 text-sky-700
+                        rounded-full text-sm font-semibold">
+          <i className="bi bi-tooth text-xs" />
+          {hallazgos.length} Hallazgos
         </div>
-
-        <div className="d-flex justify-content-center gap-3">
-          <button className="btn btn-outline-primary px-4" onClick={() => window.print()}>
-            <i className="bi bi-printer me-2" />Imprimir Receta
-          </button>
-          <button className="btn-register px-4" onClick={onVolver}>
-            <i className="bi bi-house me-2" />Volver a Consultas
-          </button>
+        <div className="flex items-center gap-1.5 px-4 py-2 bg-emerald-50 text-emerald-700
+                        rounded-full text-sm font-semibold">
+          <i className="bi bi-capsule text-xs" />
+          {prescripcion?.detalles?.length ?? 0} Medicamentos
         </div>
       </div>
+
+      <div className="flex items-center justify-center gap-3">
+        <Button
+          variant="outline"
+          onClick={() => window.print()}
+          icon={<i className="bi bi-printer" />}
+        >
+          Imprimir Receta
+        </Button>
+        <Button
+          onClick={onVolver}
+          icon={<i className="bi bi-house" />}
+        >
+          Volver a Consultas
+        </Button>
+      </div>
     </div>
-  );
-};
+  </div>
+);
 
 export default StepCierre;

@@ -70,8 +70,7 @@ public class ConsultaService {
                                                 "Cita no encontrada con id: " + request.getIdCita()));
 
                 // Buscamos si ya existe una evaluacion para esta cita para no duplicar
-                EvaluacionClinica evaluacion = evaluacionRepository
-                                .findByCita_IdCitas(request.getIdCita())
+                EvaluacionClinica evaluacion = evaluacionRepository.findByCita_IdCitas(request.getIdCita())
                                 .orElse(new EvaluacionClinica());
 
                 evaluacion.setCita(cita);
@@ -126,8 +125,7 @@ public class ConsultaService {
 
                 // Si no viene estado, usamos PENDIENTE como valor por defecto
                 try {
-                        plan.setEstadoPlan(request.getEstadoPlan() != null
-                                        ? EstadoPlan.valueOf(request.getEstadoPlan())
+                        plan.setEstadoPlan(request.getEstadoPlan() != null ? EstadoPlan.valueOf(request.getEstadoPlan())
                                         : EstadoPlan.PENDIENTE);
                 } catch (IllegalArgumentException e) {
                         plan.setEstadoPlan(EstadoPlan.PENDIENTE);
@@ -352,5 +350,4 @@ public class ConsultaService {
                                 detallesDTO);
         }
 
-        
 }

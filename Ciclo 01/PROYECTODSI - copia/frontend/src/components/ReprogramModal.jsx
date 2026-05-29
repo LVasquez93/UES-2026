@@ -1,112 +1,82 @@
 import React, { useState } from 'react';
+import Modal from './ui/Modal';
+import Button from './ui/Button';
+
+const INITIAL = { fechaCita: '', horaInicioCita: '', horaFinCita: '' };
+
+const Label = ({ children }) => (
+  <label className="block text-xs font-medium text-slate-600 mb-1">{children}</label>
+);
+
+const Input = (props) => (
+  <input
+    {...props}
+    className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl bg-white
+               text-slate-800 outline-none focus:ring-2 focus:ring-primary-500
+               focus:border-transparent transition-all"
+  />
+);
 
 /**
- * Modal para reprogramar una cita existente.
- * Maneja su propio estado de fecha/hora interno (reprogramData)
- * y delega el guardado al handler del hook useAgenda.
- *
- * Props:
- *   cita       - cita seleccionada a reprogramar (para mostrar el nombre)
- *   loading    - boolean: deshabilita acciones mientras guarda
- *   onConfirmar - (reprogramData) => void  →  llamado con los nuevos datos
- *   onCerrar   - cierra el modal sin guardar
+ * Modal de reprogramación de cita.
+ * Maneja su propio estado de fecha/hora (local al modal).
  */
 const ReprogramModal = ({ cita, loading, onConfirmar, onCerrar }) => {
-  const [reprogramData, setReprogramData] = useState({
-    fechaCita:      '',
-    horaInicioCita: '',
-    horaFinCita:    '',
-  });
+  const [reprogramData, setReprogramData] = useState(INITIAL);
 
-  const handleChange = (campo, valor) => {
+  const handleChange = (campo, valor) =>
     setReprogramData(prev => ({ ...prev, [campo]: valor }));
+
+  const handleClose = () => {
+    setReprogramData(INITIAL);
+    onCerrar();
   };
 
   return (
-    <div
-      className="modal-overlay"
-      style={{
-        position:        'fixed',
-        top: 0, left: 0,
-        width: '100%', height: '100%',
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        display:         'flex',
-        justifyContent:  'center',
-        alignItems:      'center',
-        zIndex:          1000,
-      }}
+    <Modal
+      isOpen={!!cita}
+      onClose={handleClose}
+      title="Reprogramar Cita"
+      subtitle={cita ? `Paciente: ${cita.nombreCompletoPaciente}` : ''}
+      size="sm"
+      footer={
+        <>
+          <Button variant="secondary" onClick={handleClose} disabled={loading}>
+            Cancelar
+          </Button>
+          <Button onClick={() => onConfirmar(reprogramData)} loading={loading}>
+            Confirmar cambio
+          </Button>
+        </>
+      }
     >
-      <div
-        className="modal-content bg-white p-4 rounded-4 shadow-lg"
-        style={{ width: '450px' }}
-      >
-        {/* Header */}
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <h5 className="fw-bold m-0 text-dark">Reprogramar Cita</h5>
-          <button type="button" className="btn-close" onClick={onCerrar} />
-        </div>
-
-        {/* Paciente */}
-        {cita && (
-          <p className="text-muted small mb-3">
-            Paciente: <strong>{cita.nombreCompletoPaciente}</strong>
-          </p>
-        )}
-
-        {/* Nueva Fecha */}
-        <div className="mb-3">
-          <label className="form-label-custom">Nueva Fecha</label>
-          <input
+      <div className="space-y-4">
+        <div>
+          <Label>Nueva Fecha</Label>
+          <Input
             type="date"
-            className="form-control-custom"
             value={reprogramData.fechaCita}
             onChange={e => handleChange('fechaCita', e.target.value)}
           />
         </div>
-
-        {/* Hora Inicio */}
-        <div className="mb-3">
-          <label className="form-label-custom">Nueva Hora Inicio</label>
-          <input
+        <div>
+          <Label>Nueva Hora Inicio</Label>
+          <Input
             type="datetime-local"
-            className="form-control-custom"
             value={reprogramData.horaInicioCita}
             onChange={e => handleChange('horaInicioCita', e.target.value)}
           />
         </div>
-
-        {/* Hora Fin */}
-        <div className="mb-4">
-          <label className="form-label-custom">Nueva Hora Fin</label>
-          <input
+        <div>
+          <Label>Nueva Hora Fin</Label>
+          <Input
             type="datetime-local"
-            className="form-control-custom"
             value={reprogramData.horaFinCita}
             onChange={e => handleChange('horaFinCita', e.target.value)}
           />
         </div>
-
-        {/* Acciones */}
-        <div className="d-flex gap-2">
-          <button
-            type="button"
-            className="btn-cancel w-100"
-            onClick={onCerrar}
-            disabled={loading}
-          >
-            Cerrar
-          </button>
-          <button
-            type="button"
-            className="btn-save w-100"
-            onClick={() => onConfirmar(reprogramData)}
-            disabled={loading}
-          >
-            {loading ? 'Guardando...' : 'Confirmar Cambio'}
-          </button>
-        </div>
       </div>
-    </div>
+    </Modal>
   );
 };
 

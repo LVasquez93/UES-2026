@@ -11,15 +11,14 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Date;
 
-
 @Component
 public class JwtUtil {
 
-    // La clave secreta se inyecta desde application.properties, nunca hardcodeada
+    // La clave secreta se inyecta desde application.properties 
     @Value("${jwt.secret}")
     private String secret;
 
-    // Tiempo de expiracion en milisegundos (1 hora)
+    // Tiempo de expiracion en milisegundos (1 hora) desde application.properties
     @Value("${jwt.expiration.ms}")
     private long expirationMs;
 

@@ -1,86 +1,78 @@
 import { useState, useEffect } from 'react';
-import Swal from 'sweetalert2';
+import { getMedicamentos, getPrescripcionByCita, createPrescripcion } from '../services/consulta.service';
+import { cambiarEstado } from '../services/cita.service';
+import { alertSuccess, alertError, alertWarning } from '../utils/alert.utils';
 
-const API_URL = 'http://localhost:8080/api';
+const DETALLE_INICIAL = {
+  idMedicamento:     '',
+  dosis:             '',
+  frecuencia:        '',
+  duracion:          '',
+  indicaciones:      '',
+  idPlanTratamiento: '',
+};
 
 /**
- * Hook responsable de la prescripción médica:
- * catálogo de medicamentos, lista de detalles de la receta y guardado final.
+ * Hook de prescripción médica: catálogo de medicamentos, lista de detalles y guardado.
  */
 export const usePrescripcion = (citaId, onGuardado) => {
-  const [medicamentos, setMedicamentos] = useState([]);
-  const [prescripcion, setPrescripcion] = useState(null);
-  const [detalles, setDetalles] = useState([]);
+  const [medicamentos,       setMedicamentos]       = useState([]);
+  const [prescripcion,       setPrescripcion]       = useState(null);
+  const [detalles,           setDetalles]           = useState([]);
   const [savingPrescripcion, setSavingPrescripcion] = useState(false);
+  const [detalleActual,      setDetalleActual]      = useState(DETALLE_INICIAL);
 
-  // Medicamento que se está configurando antes de agregarlo a la lista
-  const [detalleActual, setDetalleActual] = useState({
-    idMedicamento: '',
-    dosis: '',
-    frecuencia: '',
-    duracion: '',
-    indicaciones: '',
-    idPlanTratamiento: '',
-  });
-
-  // ── Carga inicial ────────────────────────────────────────────────────────
   useEffect(() => {
     if (!citaId) return;
-    fetchMedicamentos();
-    fetchPrescripcion();
+    Promise.all([loadMedicamentos(), loadPrescripcion()]);
   }, [citaId]);
 
-  const fetchMedicamentos = async () => {
+  const loadMedicamentos = async () => {
     try {
-      const res = await fetch(`${API_URL}/consulta/medicamentos`);
-      if (!res.ok) return;
-      setMedicamentos(await res.json());
-    } catch (_) { }
+      const data = await getMedicamentos();
+      setMedicamentos(data ?? []);
+    } catch (_) {}
   };
 
-  const fetchPrescripcion = async () => {
+  const loadPrescripcion = async () => {
     try {
-      const res = await fetch(`${API_URL}/consulta/prescripcion/cita/${citaId}`);
-      if (res.status === 204 || !res.ok) return;
-      setPrescripcion(await res.json());
-    } catch (_) { }
+      const data = await getPrescripcionByCita(citaId);
+      if (data) setPrescripcion(data);
+    } catch (_) {}
   };
 
-  // ── Acciones ─────────────────────────────────────────────────────────────
+  /** Helper para actualizar un campo del detalle actual */
+  const handleDetalleChange = (campo, valor) =>
+    setDetalleActual(prev => ({ ...prev, [campo]: valor }));
 
-  /**
-   * Agrega un medicamento al arreglo local `detalles` antes de guardar todo junto.
-   * @param {Array} hallazgos - Lista de hallazgos para resolver el nombre visual del plan.
-   */
+  /** Agrega el medicamento configurado a la lista local (no guarda aún) */
   const handleAgregarDetalle = (hallazgos = []) => {
     const { idMedicamento, dosis, frecuencia, duracion } = detalleActual;
     if (!idMedicamento || !dosis || !frecuencia || !duracion) {
-      Swal.fire({ icon: 'warning', title: 'Campos incompletos', text: 'Completa medicamento, dosis, frecuencia y duración.', confirmButtonColor: '#6366f1' });
+      alertWarning('Completa medicamento, dosis, frecuencia y duración.');
       return;
     }
     const med = medicamentos.find(m => m.idMedicamento === parseInt(idMedicamento));
-    const hallazgoVinculado = hallazgos.find(h => h.idPlanTratamiento === parseInt(detalleActual.idPlanTratamiento));
-    const justificacion = hallazgoVinculado
-      ? `Pieza ${hallazgoVinculado.piezaDental} - ${hallazgoVinculado.nombreTratamiento}`
+    const hallazgo = hallazgos.find(h => h.idPlanTratamiento === parseInt(detalleActual.idPlanTratamiento));
+    const justificacionVisual = hallazgo
+      ? `Pieza ${hallazgo.piezaDental} - ${hallazgo.nombreTratamiento}`
       : 'Prescripción General';
 
     setDetalles(prev => [...prev, {
       ...detalleActual,
       nombreMedicamento: med?.nombreMedicamento,
-      justificacionVisual: justificacion,
+      justificacionVisual,
     }]);
-
-    // Limpiamos el formulario para el siguiente medicamento
-    setDetalleActual({ idMedicamento: '', dosis: '', frecuencia: '', duracion: '', indicaciones: '', idPlanTratamiento: '' });
+    setDetalleActual(DETALLE_INICIAL);
   };
 
-  const handleEliminarDetalle = (index) => {
+  const handleEliminarDetalle = (index) =>
     setDetalles(prev => prev.filter((_, i) => i !== index));
-  };
 
+  /** Guarda la prescripción y cambia el estado de la cita a FINALIZADA */
   const handleGuardarPrescripcion = async () => {
     if (detalles.length === 0) {
-      Swal.fire({ icon: 'warning', title: 'Sin medicamentos', text: 'Agrega al menos un medicamento.', confirmButtonColor: '#6366f1' });
+      alertWarning('Agrega al menos un medicamento antes de guardar.');
       return;
     }
     setSavingPrescripcion(true);
@@ -88,50 +80,42 @@ export const usePrescripcion = (citaId, onGuardado) => {
       const payload = {
         idCita: parseInt(citaId),
         detalles: detalles.map(d => ({
-          idMedicamento: parseInt(d.idMedicamento),
+          idMedicamento:     parseInt(d.idMedicamento),
           idPlanTratamiento: d.idPlanTratamiento ? parseInt(d.idPlanTratamiento) : null,
-          dosis: d.dosis,
-          frecuencia: d.frecuencia,
-          duracion: parseInt(d.duracion),
-          indicaciones: d.indicaciones || '',
+          dosis:             d.dosis,
+          frecuencia:        d.frecuencia,
+          duracion:          parseInt(d.duracion),
+          indicaciones:      d.indicaciones ?? '',
         })),
       };
-      const res = await fetch(`${API_URL}/consulta/prescripcion`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Error al guardar la prescripción.');
+
+      const data = await createPrescripcion(payload);
       setPrescripcion(data);
 
-      // Actualizamos el estado de la cita a FINALIZADA
-      const resEstado = await fetch(`${API_URL}/citas/${citaId}/estado`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ estado: 'FINALIZADA' }),
-      });
-      if (!resEstado.ok) {
-        console.error('La prescripción se guardó, pero hubo un error al cambiar el estado de la cita.');
+      // Cambiar estado de la cita — si falla no bloqueamos al usuario
+      try {
+        await cambiarEstado(citaId, 'FINALIZADA');
+      } catch (err) {
+        console.error('Prescripción guardada pero fallo al cambiar estado de cita:', err.message);
       }
 
-      Swal.fire({ icon: 'success', title: 'Prescripción guardada y Cita Finalizada', confirmButtonColor: '#6366f1', timer: 1800, showConfirmButton: false });
+      alertSuccess('Prescripción guardada', '', 1800);
       onGuardado?.();
     } catch (err) {
-      Swal.fire({ icon: 'error', title: 'Error', text: err.message, confirmButtonColor: '#6366f1' });
+      alertError(err.message);
     } finally {
       setSavingPrescripcion(false);
     }
   };
 
   return {
-    // Estado
     medicamentos,
     prescripcion, setPrescripcion,
     detalles,
-    detalleActual, setDetalleActual,
+    detalleActual,
+    setDetalleActual,
+    handleDetalleChange,
     savingPrescripcion,
-    // Acciones
     handleAgregarDetalle,
     handleEliminarDetalle,
     handleGuardarPrescripcion,

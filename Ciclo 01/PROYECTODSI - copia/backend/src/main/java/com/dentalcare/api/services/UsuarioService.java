@@ -1,7 +1,7 @@
 package com.dentalcare.api.services;
 
-import com.dentalcare.api.dtos.Usuario.CreateUsuarioRequestDto;
-import com.dentalcare.api.dtos.Usuario.UpdateUsuarioRequestDto;
+import com.dentalcare.api.dtos.Usuario.CrearUsuarioRequestDto;
+import com.dentalcare.api.dtos.Usuario.ActualizarUsuarioRequestDto;
 import com.dentalcare.api.dtos.Usuario.UsuarioResponseDto;
 import com.dentalcare.api.models.Rol;
 import com.dentalcare.api.models.Usuario;
@@ -29,7 +29,7 @@ public class UsuarioService {
     }
 
     // CREAR usuario
-    public UsuarioResponseDto crearUsuario(CreateUsuarioRequestDto request) {
+    public UsuarioResponseDto crearUsuario(CrearUsuarioRequestDto request) {
 
         if (usuarioRepository.findByUsernameUsuario(request.getUsernameUsuario()).isPresent())
             throw new RuntimeException("El username '" + request.getUsernameUsuario() + "' ya esta en uso.");
@@ -53,7 +53,7 @@ public class UsuarioService {
     }
 
     // EDITAR usuario
-    public UsuarioResponseDto actualizarUsuario(Integer id, UpdateUsuarioRequestDto request) {
+    public UsuarioResponseDto actualizarUsuario(Integer id, ActualizarUsuarioRequestDto request) {
 
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario con id " + id + " no encontrado."));

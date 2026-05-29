@@ -112,4 +112,14 @@ public class CitaController {
             return org.springframework.http.ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    /**
+     * OBTENER UNA CITA POR ID
+     * GET http://localhost:8080/api/citas/{id}
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<CitaResponseDTO> obtenerCitaPorId(@PathVariable Integer id) {
+        CitaResponseDTO cita = citaService.obtenerPorId(id);
+        return ResponseEntity.ok(cita); // Retorna HTTP 200 OK con los datos de la cita
+    }
 }

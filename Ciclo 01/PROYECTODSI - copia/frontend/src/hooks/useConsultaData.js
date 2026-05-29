@@ -1,165 +1,139 @@
 import { useState, useEffect } from 'react';
-import Swal from 'sweetalert2';
-
-const API_URL = 'http://localhost:8080/api';
+import { getCitaById, cambiarEstado } from '../services/cita.service';
+import {
+  getEvaluacionByCita, createEvaluacion,
+  getHallazgos, updateEstadoHallazgo, deleteHallazgo,
+} from '../services/consulta.service';
+import { alertSuccess, alertError, alertWarning, confirmDelete, toastSuccess } from '../utils/alert.utils';
 
 /**
- * Hook responsable de cargar y gestionar los datos principales de la consulta:
- * la cita, la evaluación clínica, y los hallazgos del odontograma.
+ * Hook principal de la consulta activa.
+ * Gestiona: cita, evaluación clínica y hallazgos del odontograma.
  */
 export const useConsultaData = (citaId) => {
-  const [cita, setCita] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [cita,         setCita]         = useState(null);
+  const [loading,      setLoading]      = useState(true);
+  const [evaluacion,   setEvaluacion]   = useState(null);
+  const [diagnostico,  setDiagnostico]  = useState('');
+  const [observaciones,setObservaciones]= useState('');
+  const [savingEval,   setSavingEval]   = useState(false);
+  const [hallazgos,    setHallazgos]    = useState([]);
 
-  const [evaluacion, setEvaluacion] = useState(null);
-  const [diagnostico, setDiagnostico] = useState('');
-  const [observaciones, setObservaciones] = useState('');
-  const [savingEval, setSavingEval] = useState(false);
-
-  const [hallazgos, setHallazgos] = useState([]);
-
-  // ── Carga inicial ────────────────────────────────────────────────────────
+  // ── Carga inicial ──────────────────────────────────────────────────────────
   useEffect(() => {
     if (!citaId) return;
-    fetchCita();
+    loadCita();
   }, [citaId]);
 
-  // Cuando existe evaluación, cargamos sus hallazgos
+  // Cuando hay evaluación, cargar sus hallazgos
   useEffect(() => {
     if (evaluacion?.idEvaluacionClinica) {
       fetchHallazgos(evaluacion.idEvaluacionClinica);
     }
   }, [evaluacion]);
 
-  // ── Fetchers ─────────────────────────────────────────────────────────────
-  const fetchCita = async () => {
+  const loadCita = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/citas`);
-      if (!res.ok) throw new Error('Error al cargar citas.');
-      const todas = await res.json();
-      const encontrada = todas.find(c => c.idCitas === parseInt(citaId));
-      if (!encontrada) throw new Error('Cita no encontrada.');
-      setCita(encontrada);
-      await fetchEvaluacion();
+      // FIX BUG-09: pedir solo la cita por ID, no todas
+      const data = await getCitaById(citaId);
+      setCita(data);
+      await loadEvaluacion();
     } catch (err) {
-      Swal.fire({ icon: 'error', title: 'Error', text: err.message, confirmButtonColor: '#6366f1' });
+      alertError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchEvaluacion = async () => {
+  const loadEvaluacion = async () => {
     try {
-      const res = await fetch(`${API_URL}/consulta/evaluacion/cita/${citaId}`);
-      if (res.status === 204 || !res.ok) return;
-      const data = await res.json();
-      setEvaluacion(data);
-      setDiagnostico(data.diagnostico || '');
-      setObservaciones(data.observaciones || '');
-    } catch (_) { /* silencioso: normal que no exista aún */ }
+      const data = await getEvaluacionByCita(citaId);
+      if (data) {
+        setEvaluacion(data);
+        setDiagnostico(data.diagnostico   ?? '');
+        setObservaciones(data.observaciones ?? '');
+      }
+    } catch (_) {
+      // Normal que no exista aún — silencioso
+    }
   };
 
   const fetchHallazgos = async (idEvaluacion) => {
     try {
-      const res = await fetch(`${API_URL}/consulta/hallazgos/${idEvaluacion}`);
-      if (!res.ok) return;
-      setHallazgos(await res.json());
-    } catch (_) { }
+      const data = await getHallazgos(idEvaluacion);
+      setHallazgos(data ?? []);
+    } catch (_) {}
   };
 
-  // ── Acciones ─────────────────────────────────────────────────────────────
+  // ── Guardar evaluación ────────────────────────────────────────────────────
   const handleGuardarEvaluacion = async (onSuccess) => {
     if (!diagnostico.trim()) {
-      Swal.fire({ icon: 'warning', title: 'Campo requerido', text: 'El diagnóstico es obligatorio.', confirmButtonColor: '#6366f1' });
+      alertWarning('El diagnóstico es obligatorio.');
       return;
     }
     setSavingEval(true);
     try {
-      const res = await fetch(`${API_URL}/consulta/evaluacion`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idCita: parseInt(citaId), diagnostico, observaciones }),
+      const data = await createEvaluacion({
+        idCita: parseInt(citaId), diagnostico, observaciones,
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Error al guardar la evaluación.');
       setEvaluacion(data);
-      Swal.fire({ icon: 'success', title: 'Evaluación guardada', text: 'Puedes continuar al odontograma.', confirmButtonColor: '#6366f1', timer: 1800, showConfirmButton: false });
+      alertSuccess('Evaluación guardada', 'Puedes continuar al odontograma.', 1800);
       onSuccess?.();
     } catch (err) {
-      Swal.fire({ icon: 'error', title: 'Error', text: err.message, confirmButtonColor: '#6366f1' });
+      alertError(err.message);
     } finally {
       setSavingEval(false);
     }
   };
 
+  // ── Cambiar estado de hallazgo (optimistic update) ────────────────────────
   const handleCambiarEstado = async (idPlan, nuevoEstado) => {
+    const prevHallazgos = hallazgos;
+    setHallazgos(prev =>
+      prev.map(h => h.idPlanTratamiento === idPlan ? { ...h, estadoPlan: nuevoEstado } : h)
+    );
     try {
-      const res = await fetch(`${API_URL}/consulta/hallazgo/${idPlan}/estado`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ estado: nuevoEstado }),
-      });
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Error al actualizar el estado.');
-      }
-      setHallazgos(prev => prev.map(h =>
-        h.idPlanTratamiento === idPlan ? { ...h, estadoPlan: nuevoEstado } : h
-      ));
-      Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Estado actualizado', showConfirmButton: false, timer: 1500 });
+      await updateEstadoHallazgo(idPlan, nuevoEstado);
+      toastSuccess('Estado actualizado');
     } catch (err) {
-      Swal.fire({ icon: 'error', title: 'Error', text: err.message, confirmButtonColor: '#6366f1' });
-      fetchHallazgos(evaluacion.idEvaluacionClinica);
+      alertError(err.message);
+      setHallazgos(prevHallazgos); // Revertir
     }
   };
 
+  // ── Eliminar hallazgo ─────────────────────────────────────────────────────
   const handleEliminarHallazgo = async (idPlan) => {
-    const { isConfirmed } = await Swal.fire({
-      icon: 'warning', title: 'Eliminar hallazgo',
-      text: 'Esta acción no se puede deshacer.',
-      showCancelButton: true,
-      confirmButtonText: 'Eliminar', cancelButtonText: 'Cancelar',
-      confirmButtonColor: '#ef4444', cancelButtonColor: '#6c757d',
-    });
-    if (!isConfirmed) return;
+    const confirmed = await confirmDelete('este hallazgo');
+    if (!confirmed) return;
     try {
-      const res = await fetch(`${API_URL}/consulta/hallazgo/${idPlan}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Error al eliminar hallazgo.');
+      await deleteHallazgo(idPlan);
       setHallazgos(prev => prev.filter(h => h.idPlanTratamiento !== idPlan));
     } catch (err) {
-      Swal.fire({ icon: 'error', title: 'Error', text: err.message, confirmButtonColor: '#6366f1' });
+      alertError(err.message);
     }
   };
 
+  // ── Finalizar consulta ────────────────────────────────────────────────────
   const handleFinalizarConsulta = async (onSuccess) => {
     try {
-      const res = await fetch(`${API_URL}/citas/${citaId}/estado`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ estado: 'FINALIZADA' }),
-      });
-      if (res.ok) {
-        setCita(prev => ({ ...prev, estadoCita: 'FINALIZADA' }));
-      } else {
-        console.error('Error al cambiar estado de la cita en BD.');
-      }
+      await cambiarEstado(citaId, 'FINALIZADA');
+      setCita(prev => ({ ...prev, estadoCita: 'FINALIZADA' }));
     } catch (err) {
-      console.error('Error de red al finalizar cita:', err);
+      // Si falla el cambio de estado, avanzar igual (prescripción ya guardada)
+      console.error('No se pudo cambiar el estado de la cita:', err.message);
     } finally {
-      onSuccess?.(); // Avanza al paso 4 sin importar si falló la red
+      onSuccess?.();
     }
   };
 
   return {
-    // Estado
     cita, setCita, loading,
     evaluacion,
     diagnostico, setDiagnostico,
     observaciones, setObservaciones,
     savingEval,
     hallazgos, setHallazgos,
-    // Acciones
     fetchHallazgos,
     handleGuardarEvaluacion,
     handleCambiarEstado,

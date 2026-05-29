@@ -1,80 +1,99 @@
 import React from 'react';
-import { formatHora, getStatusClass } from '../hooks/useAgenda';
+import { formatHora, getEstadoConfig } from '../utils/cita.utils';
+import StatusBadge from './ui/StatusBadge';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 /**
- * Tarjeta de cita reutilizable.
- * Se usa tanto en la vista día (con indicador de hora lateral)
- * como en la vista semana (modo compacto, sin indicador lateral).
- *
- * Props:
- *   app        - objeto cita del backend
- *   compact    - boolean: true = vista semana (sin dot de tiempo), false = vista día
- *   onEditar   - callback al hacer clic en editar
- *   onCancelar - callback al hacer clic en cancelar
- *   onReprogram - callback al hacer clic en reprogramar
+ * Tarjeta de cita.
+ * compact=false → vista día (con línea de tiempo lateral)
+ * compact=true  → vista semana (compacta, sin línea)
  */
 const AppointmentCard = ({ app, compact = false, onEditar, onCancelar, onReprogram }) => {
-  const statusClass = getStatusClass(app.estadoCita);
+  const canCancel = !['CANCELADA', 'COMPLETADA', 'FINALIZADA'].includes(app.estadoCita);
+
+  const Actions = () => (
+    <div className="flex items-center gap-0.5">
+      <button
+        onClick={() => onEditar?.(app)}
+        aria-label="Editar cita"
+        title="Editar"
+        className="w-7 h-7 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-primary-600
+                   flex items-center justify-center transition-colors"
+      >
+        <i className="bi bi-pencil text-xs" />
+      </button>
+      {canCancel && (
+        <button
+          onClick={() => onCancelar?.(app)}
+          aria-label="Cancelar cita"
+          title="Cancelar"
+          className="w-7 h-7 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-500
+                     flex items-center justify-center transition-colors"
+        >
+          <i className="bi bi-trash text-xs" />
+        </button>
+      )}
+      {onReprogram && (
+        <button
+          onClick={() => onReprogram?.(app)}
+          aria-label="Reprogramar cita"
+          title="Reprogramar"
+          className="w-7 h-7 rounded-lg text-slate-400 hover:bg-amber-50 hover:text-amber-600
+                     flex items-center justify-center transition-colors"
+        >
+          <i className="bi bi-calendar-event text-xs" />
+        </button>
+      )}
+    </div>
+  );
 
   if (compact) {
-    // ── Vista semana: compacta, sin indicador de tiempo lateral ──────────────
     return (
-      <div className="appointment-info mb-3">
-        <div className="d-flex justify-content-between align-items-start">
-          <div>
-            <h6 className="mb-1">{app.nombreCompletoPaciente}</h6>
-            <p className="mb-0 text-muted small">
-              <i className="bi bi-clock me-1" />
-              {formatHora(app.horaInicioCita)} — {app.especialidadOdontologo}
-            </p>
-          </div>
-          <div className="d-flex flex-column align-items-end gap-1">
-            <span className={`status-tag ${statusClass}`}>{app.estadoCita}</span>
-            <div className="appointment-actions">
-              <button title="Editar" onClick={() => onEditar(app)}>
-                <i className="bi bi-pencil" />
-              </button>
-              {app.estadoCita !== 'CANCELADA' && (
-                <button title="Cancelar" className="cancel" onClick={() => onCancelar(app)}>
-                  <i className="bi bi-trash" />
-                </button>
-              )}
-            </div>
-          </div>
+      <div className="flex items-center justify-between gap-3 p-3 rounded-xl
+                      bg-white border border-slate-100 hover:border-slate-200
+                      hover:shadow-card transition-all mb-2">
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold text-slate-800 truncate">
+            {app.nombreCompletoPaciente}
+          </p>
+          <p className="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
+            <i className="bi bi-clock text-[10px]" />
+            {formatHora(app.horaInicioCita)} — {app.especialidadOdontologo}
+          </p>
+        </div>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <StatusBadge estado={app.estadoCita} />
+          <Actions />
         </div>
       </div>
     );
   }
 
-  // ── Vista día: con indicador de hora y todas las acciones ─────────────────
   return (
-    <div className="appointment-card-item">
-      <div className="time-indicator">
-        <span className="time">{formatHora(app.horaInicioCita)}</span>
-        <span className="dot" />
+    <div className="flex gap-3 mb-3">
+      {/* Indicador de hora lateral */}
+      <div className="flex flex-col items-center flex-shrink-0 w-12 pt-1">
+        <span className="text-xs font-bold text-primary-600 tabular-nums leading-none">
+          {formatHora(app.horaInicioCita)}
+        </span>
+        <div className="w-px flex-1 bg-primary-100 mt-1.5 mb-1" />
+        <div className="w-2 h-2 rounded-full bg-primary-300" />
       </div>
-      <div className="appointment-info">
-        <div className="d-flex justify-content-between align-items-start">
-          <div>
-            <h6>{app.nombreCompletoPaciente}</h6>
-            <p>{app.especialidadOdontologo}</p>
+
+      {/* Tarjeta */}
+      <div className="flex-1 bg-white border border-slate-100 rounded-xl p-3
+                      hover:border-primary-200 hover:shadow-card transition-all">
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <div className="min-w-0 flex-1">
+            <h6 className="text-sm font-semibold text-slate-800 truncate leading-tight">
+              {app.nombreCompletoPaciente}
+            </h6>
+            <p className="text-xs text-slate-400 mt-0.5">{app.especialidadOdontologo}</p>
           </div>
-          <span className={`status-tag ${statusClass}`}>{app.estadoCita}</span>
+          <StatusBadge estado={app.estadoCita} />
         </div>
-        <div className="appointment-actions">
-          <button title="Editar" onClick={() => onEditar(app)}>
-            <i className="bi bi-pencil" />
-          </button>
-          {app.estadoCita !== 'CANCELADA' && (
-            <button title="Cancelar" className="cancel" onClick={() => onCancelar(app)}>
-              <i className="bi bi-trash" />
-            </button>
-          )}
-          {onReprogram && (
-            <button title="Reprogramar" className="notify" onClick={() => onReprogram(app)}>
-              <i className="bi bi-calendar-event" />
-            </button>
-          )}
+        <div className="flex justify-end">
+          <Actions />
         </div>
       </div>
     </div>

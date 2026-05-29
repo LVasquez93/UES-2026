@@ -129,6 +129,14 @@ public class CitaService {
         return response;
     }
 
+    // Método para obtener una sola cita por su ID
+    public CitaResponseDTO obtenerPorId(Integer id) {
+        Cita cita = citaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Error: Cita no encontrada con el ID: " + id));
+        
+        return mapearAResponse(cita);
+    }
+
     // Metodo para cancelar una cita, que actualiza el estado de la cita a CANCELADA
     // y guarda el motivo de cancelación en la base de datos.
 

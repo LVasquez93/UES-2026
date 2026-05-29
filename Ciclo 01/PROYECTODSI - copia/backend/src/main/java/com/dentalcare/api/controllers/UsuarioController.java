@@ -1,7 +1,7 @@
 package com.dentalcare.api.controllers;
 
-import com.dentalcare.api.dtos.Usuario.CreateUsuarioRequestDto;
-import com.dentalcare.api.dtos.Usuario.UpdateUsuarioRequestDto;
+import com.dentalcare.api.dtos.Usuario.CrearUsuarioRequestDto;
+import com.dentalcare.api.dtos.Usuario.ActualizarUsuarioRequestDto;
 import com.dentalcare.api.dtos.Usuario.UsuarioResponseDto;
 import com.dentalcare.api.services.UsuarioService;
 import jakarta.validation.Valid;
@@ -33,7 +33,7 @@ public class UsuarioController {
 
     // POST /api/usuarios - Crear usuario
     @PostMapping
-    public ResponseEntity<?> crearUsuario(@Valid @RequestBody CreateUsuarioRequestDto request) {
+    public ResponseEntity<?> crearUsuario(@Valid @RequestBody CrearUsuarioRequestDto request) {
         try {
             UsuarioResponseDto response = usuarioService.crearUsuario(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -52,7 +52,7 @@ public class UsuarioController {
     // PUT /api/usuarios/{id} - Actualizar usuario
     @PutMapping("/{id}")
     public ResponseEntity<?> actualizarUsuario(@PathVariable Integer id,
-                                               @Valid @RequestBody UpdateUsuarioRequestDto request) {
+                                               @Valid @RequestBody ActualizarUsuarioRequestDto request) {
         try {
             UsuarioResponseDto response = usuarioService.actualizarUsuario(id, request);
             return ResponseEntity.ok(response);

@@ -1,23 +1,31 @@
 import React, { useState, useRef, useEffect } from 'react';
-
-const API_URL = 'http://localhost:8080/api';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 /**
- * Componente selector de tratamientos con búsqueda en tiempo real
- * y formulario inline para crear uno nuevo si no existe en el catálogo.
+ * Selector de tratamientos con búsqueda y formulario de creación inline.
+ *
+ * FIX BUG-07: interfaz alineada con cómo lo llama StepOdontograma.
+ * El fetch de creación sube al hook useTratamientos (principio SRP).
  *
  * Props:
- *   tratamientos        - lista de tratamientos del catálogo
- *   selectedId          - id del tratamiento actualmente seleccionado
- *   onSelect            - callback cuando el usuario selecciona un tratamiento (id: string)
- *   onTratamientoCreado - callback cuando se crea uno nuevo (tratamiento: object)
+ *   tratamientos  - lista del catálogo
+ *   selectedId    - string ID seleccionado
+ *   onSelect      - (id: string) => void
+ *   onCrear       - async (datos) => void  — el hook hace el fetch
+ *   crearLoading  - boolean: spinner mientras se crea
  */
-const TratamientoSelector = ({ tratamientos, onSelect, onTratamientoCreado, selectedId }) => {
-  const [open, setOpen]         = useState(false);
-  const [busqueda, setBusqueda] = useState('');
-  const [showForm, setShowForm] = useState(false);
-  const [saving, setSaving]     = useState(false);
-  const [nuevoTratamiento, setNuevoTratamiento] = useState({
+const TratamientoSelector = ({
+  tratamientos = [],
+  selectedId,
+  onSelect,
+  onCrear,
+  crearLoading = false,
+}) => {
+  const [open,      setOpen]      = useState(false);
+  const [busqueda,  setBusqueda]  = useState('');
+  const [showForm,  setShowForm]  = useState(false);
+  const [formError, setFormError] = useState('');
+  const [nuevo,     setNuevo]     = useState({
     nombreTratamiento:      '',
     descripcionTratamiento: '',
     costoTratamiento:       '',
@@ -25,190 +33,161 @@ const TratamientoSelector = ({ tratamientos, onSelect, onTratamientoCreado, sele
 
   const ref = useRef(null);
 
-  // Cierra el dropdown al hacer clic fuera
   useEffect(() => {
-    const handleClickOutside = (e) => {
+    const handler = (e) => {
       if (ref.current && !ref.current.contains(e.target)) {
-        setOpen(false);
-        setShowForm(false);
-        setBusqueda('');
+        setOpen(false); setShowForm(false); setBusqueda('');
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  // Filtra la lista según el texto de búsqueda (case-insensitive)
   const filtrados = tratamientos.filter(t =>
     t.nombreTratamiento.toLowerCase().includes(busqueda.toLowerCase()) ||
     t.descripcionTratamiento?.toLowerCase().includes(busqueda.toLowerCase())
   );
 
-  const seleccionado = tratamientos.find(t => t.idTratamiento === parseInt(selectedId));
+  const seleccionado = tratamientos.find(t => String(t.idTratamiento) === selectedId);
 
-  // Crea un nuevo tratamiento y notifica al padre para que recargue la lista
   const handleCrear = async () => {
-    if (!nuevoTratamiento.nombreTratamiento || !nuevoTratamiento.costoTratamiento) {
-      alert('Nombre y costo son obligatorios.');
+    if (!nuevo.nombreTratamiento.trim() || !nuevo.costoTratamiento) {
+      setFormError('Nombre y costo son obligatorios.');
       return;
     }
-    setSaving(true);
+    setFormError('');
     try {
-      const res = await fetch(`${API_URL}/consulta/tratamientos`, {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({
-          ...nuevoTratamiento,
-          costoTratamiento:       parseFloat(nuevoTratamiento.costoTratamiento),
-          descripcionTratamiento: nuevoTratamiento.descripcionTratamiento || nuevoTratamiento.nombreTratamiento,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Error al crear tratamiento.');
-      onTratamientoCreado(data);
-      onSelect(String(data.idTratamiento));
-      setNuevoTratamiento({ nombreTratamiento: '', descripcionTratamiento: '', costoTratamiento: '' });
+      await onCrear(nuevo);
+      setNuevo({ nombreTratamiento: '', descripcionTratamiento: '', costoTratamiento: '' });
       setShowForm(false);
       setOpen(false);
     } catch (err) {
-      alert(err.message);
-    } finally {
-      setSaving(false);
+      setFormError(err.message);
     }
   };
 
   return (
-    <div ref={ref} style={{ position: 'relative' }}>
+    <div ref={ref} className="relative">
 
-      {/* Botón que abre el dropdown */}
-      <div
-        className="treatment-dropdown"
-        onClick={() => { setOpen(prev => !prev); setShowForm(false); }}
-        style={{ cursor: 'pointer' }}
+      {/* Trigger */}
+      <button
+        type="button"
+        onClick={() => setOpen(p => !p)}
+        className="w-full flex items-center justify-between px-3 py-2.5 bg-white
+                   border border-slate-200 rounded-xl text-sm text-left
+                   hover:border-primary-300 focus:outline-none focus:ring-2
+                   focus:ring-primary-500 transition-colors"
       >
-        <div className="dropdown-header">
-          <span>{seleccionado ? seleccionado.nombreTratamiento : 'Seleccione un tratamiento'}</span>
-          <i className={`bi bi-chevron-${open ? 'up' : 'down'}`} />
-        </div>
-      </div>
+        <span className={seleccionado ? 'text-slate-800 font-medium' : 'text-slate-400'}>
+          {seleccionado ? seleccionado.nombreTratamiento : 'Seleccione un tratamiento...'}
+        </span>
+        <i className={`bi bi-chevron-${open ? 'up' : 'down'} text-slate-400 text-xs flex-shrink-0`} />
+      </button>
 
-      {/* Panel desplegable */}
+      {/* Dropdown */}
       {open && (
-        <div style={{
-          position:        'absolute',
-          top:             'calc(100% + 4px)',
-          left: 0, right:  0,
-          backgroundColor: '#fff',
-          border:          '1px solid var(--border-color)',
-          borderRadius:    '12px',
-          boxShadow:       '0 8px 24px rgba(0,0,0,0.12)',
-          zIndex:          600,
-          overflow:        'hidden',
-        }}>
+        <div className="absolute top-[calc(100%+4px)] left-0 right-0 z-50
+                        bg-white border border-slate-200 rounded-xl
+                        shadow-xl shadow-slate-200/50 overflow-hidden animate-fade-in">
 
           {/* Buscador */}
-          <div style={{ padding: '10px', borderBottom: '1px solid var(--border-color)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px',
-                          background: '#f8fafc', borderRadius: '8px', padding: '8px 12px' }}>
-              <i className="bi bi-search text-muted" style={{ fontSize: '0.85rem' }} />
+          <div className="p-2 border-b border-slate-100">
+            <div className="flex items-center gap-2 bg-slate-50 rounded-lg px-3 py-2">
+              <i className="bi bi-search text-slate-400 text-xs flex-shrink-0" />
               <input
                 type="text"
                 placeholder="Buscar tratamiento..."
                 value={busqueda}
                 onChange={e => setBusqueda(e.target.value)}
                 onClick={e => e.stopPropagation()}
-                style={{ border: 'none', background: 'transparent', outline: 'none',
-                         width: '100%', fontSize: '0.85rem' }}
                 autoFocus
+                className="bg-transparent text-sm outline-none w-full text-slate-700
+                           placeholder-slate-400"
               />
             </div>
           </div>
 
-          {/* Lista filtrada */}
-          <div style={{ maxHeight: '220px', overflowY: 'auto' }}>
-            {filtrados.length === 0 && (
-              <p className="text-muted small text-center py-3 mb-0">
+          {/* Lista */}
+          <div className="max-h-52 overflow-y-auto">
+            {filtrados.length === 0 ? (
+              <p className="text-xs text-slate-400 text-center py-4">
                 No se encontró "{busqueda}"
               </p>
-            )}
-            {filtrados.map(t => (
-              <div
-                key={t.idTratamiento}
-                onClick={() => { onSelect(String(t.idTratamiento)); setOpen(false); setBusqueda(''); }}
-                style={{
-                  padding:    '12px 16px',
-                  cursor:     'pointer',
-                  background: selectedId === String(t.idTratamiento) ? '#eef2ff' : 'transparent',
-                  borderLeft: selectedId === String(t.idTratamiento) ? '3px solid var(--primary-color)' : '3px solid transparent',
-                  transition: 'background 0.15s',
-                }}
-                onMouseEnter={e => { if (selectedId !== String(t.idTratamiento)) e.currentTarget.style.background = '#f8fafc'; }}
-                onMouseLeave={e => { if (selectedId !== String(t.idTratamiento)) e.currentTarget.style.background = 'transparent'; }}
-              >
-                <div style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--text-main)' }}>
-                  {t.nombreTratamiento}
-                </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-light)' }}>
-                  {t.descripcionTratamiento} — <strong>${t.costoTratamiento}</strong>
-                </div>
-              </div>
-            ))}
+            ) : filtrados.map(t => {
+              const isSelected = selectedId === String(t.idTratamiento);
+              return (
+                <button
+                  key={t.idTratamiento}
+                  type="button"
+                  onClick={() => { onSelect(String(t.idTratamiento)); setOpen(false); setBusqueda(''); }}
+                  className={`w-full text-left px-4 py-2.5 transition-colors border-l-2
+                              ${isSelected
+                                ? 'bg-primary-50 border-l-primary-500'
+                                : 'hover:bg-slate-50 border-l-transparent'}`}
+                >
+                  <p className={`text-sm font-semibold leading-tight
+                                 ${isSelected ? 'text-primary-700' : 'text-slate-700'}`}>
+                    {t.nombreTratamiento}
+                  </p>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    {t.descripcionTratamiento} — <strong>${t.costoTratamiento}</strong>
+                  </p>
+                </button>
+              );
+            })}
           </div>
 
-          {/* Botón para crear nuevo */}
-          <div style={{ borderTop: '1px solid var(--border-color)', padding: '10px' }}>
+          {/* Crear nuevo */}
+          <div className="border-t border-slate-100 p-2">
             <button
-              onClick={e => { e.stopPropagation(); setShowForm(prev => !prev); }}
-              style={{ background: 'none', border: 'none', color: 'var(--primary-color)',
-                       fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer',
-                       width: '100%', textAlign: 'left', padding: '4px 6px' }}
+              type="button"
+              onClick={e => { e.stopPropagation(); setShowForm(p => !p); setFormError(''); }}
+              className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold
+                         text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
             >
-              <i className="bi bi-plus-circle me-2" />
+              <i className={`bi bi-${showForm ? 'x-circle' : 'plus-circle'}`} />
               {showForm ? 'Cancelar nuevo tratamiento' : 'Crear tratamiento nuevo'}
             </button>
           </div>
 
-          {/* Formulario inline de creación */}
+          {/* Formulario inline */}
           {showForm && (
             <div
-              style={{ padding: '12px 16px', borderTop: '1px solid var(--border-color)', background: '#f8fafc' }}
+              className="border-t border-slate-100 p-4 bg-slate-50 space-y-2"
               onClick={e => e.stopPropagation()}
             >
-              <p className="fw-bold small mb-2" style={{ color: 'var(--primary-color)' }}>
-                Nuevo tratamiento
-              </p>
-              <div className="mb-2">
-                <input type="text" className="form-control-custom"
-                  placeholder="Nombre del tratamiento *"
-                  value={nuevoTratamiento.nombreTratamiento}
-                  onChange={e => setNuevoTratamiento({ ...nuevoTratamiento, nombreTratamiento: e.target.value })}
-                  style={{ fontSize: '0.85rem', padding: '8px 10px' }}
+              <p className="text-xs font-bold text-primary-700">Nuevo tratamiento</p>
+              {formError && (
+                <p className="text-xs text-red-600 flex items-center gap-1">
+                  <i className="bi bi-exclamation-circle" />{formError}
+                </p>
+              )}
+              {[
+                { placeholder: 'Nombre del tratamiento *',   field: 'nombreTratamiento',      type: 'text'   },
+                { placeholder: 'Descripción (opcional)',      field: 'descripcionTratamiento', type: 'text'   },
+                { placeholder: 'Costo base ($) *',           field: 'costoTratamiento',       type: 'number' },
+              ].map(({ placeholder, field, type }) => (
+                <input
+                  key={field}
+                  type={type}
+                  placeholder={placeholder}
+                  value={nuevo[field]}
+                  onChange={e => setNuevo(p => ({ ...p, [field]: e.target.value }))}
+                  min={type === 'number' ? '0' : undefined}
+                  step={type === 'number' ? '0.01' : undefined}
+                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg
+                             bg-white outline-none focus:ring-2 focus:ring-primary-500
+                             focus:border-transparent transition-all"
                 />
-              </div>
-              <div className="mb-2">
-                <input type="text" className="form-control-custom"
-                  placeholder="Descripción (opcional)"
-                  value={nuevoTratamiento.descripcionTratamiento}
-                  onChange={e => setNuevoTratamiento({ ...nuevoTratamiento, descripcionTratamiento: e.target.value })}
-                  style={{ fontSize: '0.85rem', padding: '8px 10px' }}
-                />
-              </div>
-              <div className="mb-3">
-                <input type="number" className="form-control-custom"
-                  placeholder="Costo ($) *"
-                  value={nuevoTratamiento.costoTratamiento}
-                  onChange={e => setNuevoTratamiento({ ...nuevoTratamiento, costoTratamiento: e.target.value })}
-                  style={{ fontSize: '0.85rem', padding: '8px 10px' }}
-                  min="0" step="0.01"
-                />
-              </div>
+              ))}
               <button
-                className="btn-register w-100"
-                style={{ padding: '10px', fontSize: '0.85rem' }}
+                type="button"
                 onClick={handleCrear}
-                disabled={saving}
+                disabled={crearLoading}
+                className="w-full py-2 bg-primary-600 text-white text-xs font-semibold
+                           rounded-lg hover:bg-primary-700 disabled:opacity-50 transition-colors"
               >
-                {saving ? 'Guardando...' : 'Guardar y seleccionar'}
+                {crearLoading ? 'Guardando...' : 'Guardar y seleccionar'}
               </button>
             </div>
           )}

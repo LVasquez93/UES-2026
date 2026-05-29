@@ -1,20 +1,17 @@
 import React, { useState } from 'react';
 import { Odontogram } from 'react-odontogram';
+// IMPORTANTE: mantener este import — proviene del paquete npm, no del CSS propio
 import 'react-odontogram/style.css';
 import HallazgosList from './HallazgosList';
 import TratamientoSelector from './TratamientoSelector';
+import Button from './ui/Button';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const FILTERS = ['Hallazgos', 'Presupuestado', 'Programado', 'Realizado'];
 
 /**
  * Paso 2: Odontograma y registro de hallazgos.
- * Columna izquierda: odontograma o tabla de historial según filtro activo.
- * Columna derecha: panel de registro con selector de tratamiento.
- *
- * 🐛 BUG CORREGIDO (línea original ~621):
- *    La condición `activeFilter === 'Programado' || activeFilter === 'Realizado' ? ...`
- *    no tenía paréntesis, causando que el operador ternario nunca se evaluara
- *    correctamente para mostrar la tabla. Corregido con paréntesis explícitos.
+ * FIX BUG-07: props de TratamientoSelector alineadas con su nueva interfaz.
  */
 const StepOdontograma = ({
   cita,
@@ -28,76 +25,60 @@ const StepOdontograma = ({
   selectedTratamiento, setSelectedTratamiento,
   customPrecio, setCustomPrecio,
   savingHallazgo,
-  mostrarFormNuevo, setMostrarFormNuevo,
-  nuevoTratamiento, setNuevoTratamiento,
   onOdontogramChange,
   onRegistrarHallazgo,
-  onCrearNuevoTratamiento,
+  onCrearTratamiento,
   // Navegación
   onVolver,
   onContinuar,
 }) => {
   const [activeFilter, setActiveFilter] = useState('Hallazgos');
-
+  const showHistorial = activeFilter === 'Programado' || activeFilter === 'Realizado';
   const piecesText = selectedTeeth.map(t => t.notations?.fdi || t.id).join(', ');
 
-  // ✅ FIX: paréntesis explícitos para que el || no rompa el ternario
-  const showHistorial = (activeFilter === 'Programado' || activeFilter === 'Realizado');
-
   return (
-    <div className="workspace-card mt-3 animate__animated animate__fadeIn">
+    <div className="flex gap-4 mt-4 flex-1 overflow-hidden animate-fade-in">
 
-      {/* ── COLUMNA IZQUIERDA ─────────────────────────────────────────────── */}
-      <div className="odontogram-section">
+      {/* ── COLUMNA IZQUIERDA: Odontograma ──────────────────────────────── */}
+      <div className="flex-1 flex flex-col bg-white rounded-2xl border border-slate-200
+                      shadow-card overflow-hidden min-w-0">
 
         {/* Barra de filtros */}
-        <div className="filters-bar">
-          <i className="bi bi-funnel text-muted" />
-          <span className="small text-muted">Filtros:</span>
+        <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-100 flex-shrink-0">
+          <i className="bi bi-funnel text-slate-400 text-sm" />
+          <span className="text-xs text-slate-400">Filtros:</span>
           {FILTERS.map(f => (
             <button
               key={f}
-              className={`filter-pill ${activeFilter === f ? 'active' : ''}`}
+              type="button"
               onClick={() => setActiveFilter(f)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors
+                          ${activeFilter === f
+                            ? 'bg-primary-600 text-white'
+                            : 'text-slate-600 hover:bg-slate-100'}`}
             >
               {f}
             </button>
           ))}
         </div>
 
-        <div
-          className="odontogram-container"
-          style={{ minHeight: '400px', display: 'flex', flexDirection: 'column' }}
-        >
-          {/* ✅ Condición corregida con paréntesis */}
+        {/* Contenido principal */}
+        <div className="flex-1 overflow-y-auto p-4">
           {showHistorial ? (
-            <div className="w-100 p-3 border rounded-3 bg-white" style={{ maxHeight: '400px', overflowY: 'auto' }}>
-              <h6 className="fw-bold text-primary mb-3">
-                <i className="bi bi-clock-history me-2" />
+            <div>
+              <h6 className="font-bold text-primary-700 text-sm flex items-center gap-2 mb-3">
+                <i className="bi bi-clock-history" />
                 {activeFilter === 'Realizado' ? 'Historial de Tratamientos' : 'Tratamientos Programados'}
               </h6>
-              <div className="alert alert-light border small text-muted">
-                <i className="bi bi-info-circle me-2" />
-                Aquí se visualizará el historial global de {cita.nombreCompletoPaciente}.
+              <div className="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200
+                              rounded-xl text-sm text-slate-500 mb-3">
+                <i className="bi bi-info-circle text-primary-500" />
+                Historial global de {cita.nombreCompletoPaciente}.
               </div>
-              <table className="table table-hover table-sm mt-2">
-                <thead className="table-light">
-                  <tr>
-                    <th>Fecha</th>
-                    <th>Pieza</th>
-                    <th>Tratamiento</th>
-                    <th>Estado</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td colSpan="4" className="text-center text-muted py-4">
-                      <i className="bi bi-folder2-open d-block mb-2" style={{ fontSize: '1.5rem' }} />
-                      Conectando historial...
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              <div className="text-center py-8 text-slate-400">
+                <i className="bi bi-folder2-open text-4xl block mb-2" />
+                <p className="text-sm">Conectando historial...</p>
+              </div>
             </div>
           ) : (
             <>
@@ -105,71 +86,96 @@ const StepOdontograma = ({
                 onChange={onOdontogramChange}
                 theme="light"
                 notation="FDI"
-                className="custom-odontogram"
               />
-              <p className="text-center text-muted small mt-2">
-                Selecciona piezas en el gráfico y registra el tratamiento en el panel derecho
+              <p className="text-center text-xs text-slate-400 mt-3">
+                Selecciona piezas y registra el tratamiento en el panel derecho
               </p>
             </>
           )}
         </div>
 
-        {/* Lista de hallazgos debajo del odontograma */}
-        <HallazgosList
-          hallazgos={hallazgos}
-          onCambiarEstado={onCambiarEstado}
-          onEliminar={onEliminarHallazgo}
-        />
+        {/* Lista de hallazgos */}
+        <div className="border-t border-slate-100 px-4 pb-4 max-h-64 overflow-y-auto">
+          <HallazgosList
+            hallazgos={hallazgos}
+            onCambiarEstado={onCambiarEstado}
+            onEliminar={onEliminarHallazgo}
+          />
+        </div>
       </div>
 
-      {/* ── COLUMNA DERECHA: PANEL DE REGISTRO ───────────────────────────── */}
-      <aside className="control-panel">
-        <div className="row g-3 mb-3">
+      {/* ── COLUMNA DERECHA: Panel de registro ──────────────────────────── */}
+      <aside className="w-72 flex-shrink-0 flex flex-col bg-white rounded-2xl
+                        border border-slate-200 shadow-card p-4 gap-4 overflow-y-auto">
 
-          {/* Piezas seleccionadas */}
-          <div className="col-12">
-            <label className="form-label-custom">Piezas seleccionadas (FDI)</label>
-            <input
-              type="text"
-              className="form-control-custom"
-              value={piecesText}
-              placeholder="Selecciona en el odontograma..."
-              readOnly
-            />
-          </div>
+        <h6 className="font-bold text-slate-800 text-sm">Registrar hallazgo</h6>
 
-          {/* Selector de tratamiento (componente reutilizable) */}
-          <div className="col-12">
-            <TratamientoSelector
-              tratamientos={tratamientos}
-              selectedTratamiento={selectedTratamiento}
-              setSelectedTratamiento={setSelectedTratamiento}
-              customPrecio={customPrecio}
-              setCustomPrecio={setCustomPrecio}
-              mostrarFormNuevo={mostrarFormNuevo}
-              setMostrarFormNuevo={setMostrarFormNuevo}
-              nuevoTratamiento={nuevoTratamiento}
-              setNuevoTratamiento={setNuevoTratamiento}
-              onCrearNuevo={onCrearNuevoTratamiento}
-            />
-          </div>
+        {/* Piezas seleccionadas */}
+        <div>
+          <label className="block text-xs font-medium text-slate-600 mb-1">
+            Piezas seleccionadas (FDI)
+          </label>
+          <input
+            type="text"
+            value={piecesText}
+            readOnly
+            placeholder="Selecciona en el odontograma..."
+            className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl bg-slate-50
+                       text-slate-600 outline-none"
+          />
         </div>
 
-        <button
-          className="btn-register mb-3"
-          onClick={onRegistrarHallazgo}
-          disabled={savingHallazgo || selectedTeeth.length === 0 || !selectedTratamiento || mostrarFormNuevo}
-        >
-          {savingHallazgo ? 'Registrando...' : 'Registrar Hallazgo'}
-        </button>
+        {/* Selector de tratamiento — FIX BUG-07 */}
+        <div>
+          <label className="block text-xs font-medium text-slate-600 mb-1">Tratamiento</label>
+          <TratamientoSelector
+            tratamientos={tratamientos}
+            selectedId={selectedTratamiento}
+            onSelect={(id) => {
+              setSelectedTratamiento(id);
+              const t = tratamientos.find(tr => String(tr.idTratamiento) === id);
+              if (t) setCustomPrecio(String(t.costoTratamiento));
+            }}
+            onCrear={onCrearTratamiento}
+            crearLoading={savingHallazgo}
+          />
+        </div>
 
-        <div className="mt-auto d-flex flex-column gap-2">
-          <button className="btn-cancel" onClick={onVolver}>
-            <i className="bi bi-arrow-left me-1" />Volver a evaluación
-          </button>
-          <button className="btn-register" onClick={onContinuar}>
-            Continuar a prescripción<i className="bi bi-arrow-right ms-1" />
-          </button>
+        {/* Precio aplicado */}
+        <div>
+          <label className="block text-xs font-medium text-slate-600 mb-1">Precio aplicado ($)</label>
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            value={customPrecio}
+            onChange={e => setCustomPrecio(e.target.value)}
+            placeholder="0.00"
+            className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl bg-white
+                       text-slate-800 outline-none focus:ring-2 focus:ring-primary-500
+                       focus:border-transparent transition-all"
+          />
+        </div>
+
+        {/* Botón registrar */}
+        <Button
+          fullWidth
+          onClick={onRegistrarHallazgo}
+          loading={savingHallazgo}
+          disabled={selectedTeeth.length === 0 || !selectedTratamiento || savingHallazgo}
+        >
+          <i className="bi bi-plus-circle" />
+          Registrar hallazgo
+        </Button>
+
+        <div className="mt-auto flex flex-col gap-2">
+          <Button variant="secondary" fullWidth onClick={onVolver} icon={<i className="bi bi-arrow-left" />}>
+            Volver a evaluación
+          </Button>
+          <Button fullWidth onClick={onContinuar}>
+            Continuar a prescripción
+            <i className="bi bi-arrow-right" />
+          </Button>
         </div>
       </aside>
     </div>

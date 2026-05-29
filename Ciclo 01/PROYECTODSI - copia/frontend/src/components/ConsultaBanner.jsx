@@ -1,66 +1,98 @@
 import React from 'react';
+import 'bootstrap-icons/font/bootstrap-icons.css';
+
+const STEPS = [
+  { num: 1, label: 'Evaluación'  },
+  { num: 2, label: 'Odontograma' },
+  { num: 3, label: 'Prescripción'},
+  { num: 4, label: 'Cierre'      },
+];
 
 /**
  * Banner superior de la consulta activa.
- * Muestra los datos del paciente y el indicador de pasos.
+ * Muestra info del paciente y el indicador de pasos.
  */
-const STEPS = [
-  { num: 1, label: 'Evaluación' },
-  { num: 2, label: 'Odontograma' },
-  { num: 3, label: 'Prescripción' },
-  { num: 4, label: 'Cierre' },
-];
+const ConsultaBanner = ({ cita, step, onStepClick, onVolver }) => (
+  <div className="flex items-center justify-between gap-4 bg-white rounded-2xl
+                  border border-slate-200 shadow-card px-5 py-3 flex-shrink-0
+                  animate-fade-in-down">
 
-const ConsultaBanner = ({ cita, step, onStepClick, onVolver }) => {
-  return (
-    <div className="consultation-banner animate__animated animate__fadeInDown">
+    {/* Info del paciente */}
+    <div className="flex items-center gap-4 min-w-0">
+      <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 transition-colors
+                        ${step >= 4 ? 'bg-emerald-500' : 'bg-amber-400'}`} />
 
-      {/* Chip del paciente */}
-      <div className="d-flex align-items-center gap-3">
-        <div
-          className="consultation-status-dot"
-          style={{ backgroundColor: step >= 4 ? '#22c55e' : '#f59e0b' }}
-        />
-        <div>
-          <span className="text-muted small d-block">Consulta en curso</span>
-          <h6 className="fw-bold m-0">{cita.nombreCompletoPaciente}</h6>
-        </div>
-        <div className="vr mx-2" />
-        <div>
-          <span className="text-muted small d-block">DUI</span>
-          <span className="fw-semibold small">{cita.numeroIdentidadPaciente}</span>
-        </div>
-        <div className="vr mx-2" />
-        <div>
-          <span className="text-muted small d-block">Especialidad</span>
-          <span className="fw-semibold small">{cita.especialidadOdontologo}</span>
-        </div>
+      <div className="min-w-0">
+        <span className="text-xs text-slate-400 block leading-none mb-0.5">Consulta en curso</span>
+        <h6 className="font-bold text-slate-800 text-sm truncate leading-tight">
+          {cita.nombreCompletoPaciente}
+        </h6>
       </div>
 
-      {/* Indicador de pasos */}
-      <div className="steps-indicator">
-        {STEPS.map(s => (
-          <div
-            key={s.num}
-            className={`step-pill ${step === s.num ? 'active' : step > s.num ? 'done' : ''}`}
-            onClick={() => step > s.num && onStepClick(s.num)}
-            style={{ cursor: step > s.num ? 'pointer' : 'default' }}
-          >
-            {step > s.num
-              ? <i className="bi bi-check-circle-fill me-1" />
-              : <span className="step-number">{s.num}</span>
-            }
-            {s.label}
-          </div>
-        ))}
+      <div className="hidden sm:block w-px h-8 bg-slate-200 flex-shrink-0" />
+
+      <div className="hidden sm:block min-w-0">
+        <span className="text-[10px] text-slate-400 block uppercase tracking-wide">DUI</span>
+        <span className="text-sm font-semibold text-slate-700">{cita.numeroIdentidadPaciente}</span>
       </div>
 
-      {/* Botón volver */}
-      <button className="btn btn-sm btn-outline-secondary" onClick={onVolver}>
-        <i className="bi bi-arrow-left me-1" />Volver
-      </button>
+      <div className="hidden md:block w-px h-8 bg-slate-200 flex-shrink-0" />
+
+      <div className="hidden md:block min-w-0">
+        <span className="text-[10px] text-slate-400 block uppercase tracking-wide">Especialidad</span>
+        <span className="text-sm font-semibold text-slate-700">{cita.especialidadOdontologo}</span>
+      </div>
     </div>
-  );
-};
+
+    {/* Stepper */}
+    <nav aria-label="Pasos de la consulta" className="flex items-center gap-1">
+      {STEPS.map((s, i) => {
+        const done   = step > s.num;
+        const active = step === s.num;
+        return (
+          <React.Fragment key={s.num}>
+            <button
+              type="button"
+              onClick={() => done && onStepClick(s.num)}
+              disabled={!done}
+              aria-label={s.label}
+              aria-current={active ? 'step' : undefined}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
+                          transition-all duration-150 focus-visible:outline-2 focus-visible:outline-primary-500
+                          disabled:cursor-default
+                          ${active
+                            ? 'bg-primary-600 text-white shadow-sm shadow-primary-200'
+                            : done
+                              ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 cursor-pointer'
+                              : 'bg-slate-100 text-slate-400 cursor-default'}`}
+            >
+              {done
+                ? <i className="bi bi-check-circle-fill text-[11px]" aria-hidden="true" />
+                : <span className="w-4 h-4 rounded-full border border-current flex items-center
+                                   justify-center text-[10px] leading-none">{s.num}</span>
+              }
+              <span className="hidden sm:inline">{s.label}</span>
+            </button>
+            {i < STEPS.length - 1 && (
+              <div className={`w-3 h-px flex-shrink-0 ${step > s.num + 1 ? 'bg-emerald-300' : 'bg-slate-200'}`} />
+            )}
+          </React.Fragment>
+        );
+      })}
+    </nav>
+
+    {/* Botón volver */}
+    <button
+      type="button"
+      onClick={onVolver}
+      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600
+                 border border-slate-200 rounded-lg hover:bg-slate-100 transition-colors
+                 flex-shrink-0 focus-visible:outline-2 focus-visible:outline-primary-500"
+    >
+      <i className="bi bi-arrow-left text-xs" />
+      <span className="hidden sm:inline">Volver</span>
+    </button>
+  </div>
+);
 
 export default ConsultaBanner;

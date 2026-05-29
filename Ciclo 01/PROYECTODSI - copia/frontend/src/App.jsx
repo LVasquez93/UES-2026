@@ -1,45 +1,58 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Login from "./views/Login";
-import HomeDashboard from "./views/HomeDashboard";
-import ActiveConsultation from "./views/ActiveConsultation";
-import ScheduleAppointments from "./views/ScheduleAppointments";
-import PatientManagement from "./views/PatientManagement";
-import ProtectedRoute from "./components/ProtectedRoute";
-import Layout from "./components/Layout";
-import UserManagement from "./views/UserManagement";
-import ConsultaIndex from "./views/ConsultaIndex";
+import { lazy, Suspense } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import ProtectedRoute from './components/ProtectedRoute';
+import Layout from './components/Layout';
+import LoadingScreen from './components/ui/LoadingScreen';
 
-function App() {
+/**
+ * Lazy imports — cada módulo genera su propio chunk en el build.
+ * El bundle inicial solo carga Login + el shell de la aplicación.
+ */
+const LoginPage            = lazy(() => import('./views/LoginPage'));
+const DashboardPage        = lazy(() => import('./views/DashboardPage'));
+const AppointmentPage      = lazy(() => import('./views/AppointmentPage'));
+const PatientManagementPage= lazy(() => import('./views/PatientManagementPage'));
+const UserManagementPage   = lazy(() => import('./views/UserManagementPage'));
+const ConsultaIndexPage    = lazy(() => import('./views/ConsultaIndexPage'));
+const ActiveConsultationPage=lazy(() => import('./views/ActiveConsultationPage'));
+
+const NotFound = () => (
+  <div className="flex flex-col items-center justify-center h-full py-20 gap-4">
+    <i className="bi bi-exclamation-circle text-5xl text-slate-300" />
+    <h2 className="text-2xl font-bold text-slate-600">404 — Página no encontrada</h2>
+    <p className="text-slate-400 text-sm">La ruta que buscas no existe.</p>
+  </div>
+);
+
+export default function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        {/* Ruta publica: no requiere autenticacion */}
-        <Route path="/" element={<Login />} />
+      <Suspense fallback={<LoadingScreen />}>
+        <Routes>
+          {/* ── Ruta pública ─────────────────────────────────────────── */}
+          <Route path="/" element={<LoginPage />} />
 
-        {/* Rutas privadas: requieren token valido y renderizan dentro del Layout */}
-        <Route
-          element={
-            <ProtectedRoute>
-              <Layout />
-            </ProtectedRoute>
-          }
-        >
-          <Route path="/dashboard"   element={<HomeDashboard />} />
-          {/* <Route path="/odontograma" element={<DentalDashboard />} /> */}
-          <Route path="/agenda"      element={<ScheduleAppointments />} />
-          <Route path="/pacientes"   element={<PatientManagement />} />
-          <Route path="/usuarios"    element={<UserManagement />} />
+          {/* ── Rutas privadas: dentro del Layout ────────────────────── */}
+          <Route
+            element={
+              <ProtectedRoute>
+                <Layout />
+              </ProtectedRoute>
+            }
+          >
+            {/* FIX BUG-08: unificado a /dashboard (antes era /iniciodashboard) */}
+            <Route path="/dashboard"          element={<DashboardPage />} />
+            <Route path="/agenda"             element={<AppointmentPage />} />
+            <Route path="/pacientes"          element={<PatientManagementPage />} />
+            <Route path="/usuarios"           element={<UserManagementPage />} />
+            <Route path="/consulta"           element={<ConsultaIndexPage />} />
+            <Route path="/consulta/:citaId"   element={<ActiveConsultationPage />} />
 
-          {/* Lista de citas del dia: punto de entrada al modulo de consulta */}
-          <Route path="/consulta" element={<ConsultaIndex />} />
-
-          {/* Consulta activa: recibe el ID de la cita como parametro de URL
-              No se puede navegar aqui sin un citaId valido */}
-          <Route path="/consulta/:citaId" element={<ActiveConsultation/>} />
-        </Route>
-      </Routes>
+            {/* Catch-all dentro del layout */}
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }
-
-export default App;
