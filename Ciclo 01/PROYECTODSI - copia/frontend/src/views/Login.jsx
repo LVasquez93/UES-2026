@@ -7,9 +7,9 @@ import '../estilos/Login.css';
 
 const Login = () => {
   const [identifier, setIdentifier] = useState('');
-  const [password, setPassword]     = useState('');
-  const [error, setError]           = useState('');
-  const [isLoading, setIsLoading]   = useState(false);
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -85,9 +85,11 @@ const Login = () => {
               <div className="input-group-custom">
                 <i className="bi bi-person text-muted"></i>
                 <input
-                  type="text"
                   className="form-control-custom"
                   placeholder="ejemplo@dentalcare.com"
+                  type="text"
+                  // 👇 Solución: añade esta línea
+                  autoComplete="username"   // o "email" si solo usas correos
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
                   disabled={isLoading}
@@ -104,6 +106,7 @@ const Login = () => {
                   type="password"
                   className="form-control-custom"
                   placeholder="contrasena"
+                  autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isLoading}

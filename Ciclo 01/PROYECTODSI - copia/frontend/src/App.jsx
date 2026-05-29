@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./views/Login";
 import HomeDashboard from "./views/HomeDashboard";
-import DentalDashboard from "./views/ActiveConsultation";
+import ActiveConsultation from "./views/ActiveConsultation";
 import ScheduleAppointments from "./views/ScheduleAppointments";
 import PatientManagement from "./views/PatientManagement";
 import ProtectedRoute from "./components/ProtectedRoute";

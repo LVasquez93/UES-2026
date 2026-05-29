@@ -4,10 +4,10 @@ import 'react-calendar/dist/Calendar.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../estilos/ScheduleAppointments.css';
 
-// Hook
+// Hook con toda la lógica de negocio y los helpers de fecha/hora
 import { useAgenda, formatFechaHeader } from '../hooks/useAgenda';
 
-// Componentes
+// Componentes de UI
 import AppointmentForm  from '../components/AppointmentForm';
 import AppointmentCard  from '../components/AppointmentCard';
 import ReprogramModal   from '../components/ReprogramModal';
@@ -16,23 +16,23 @@ import ReprogramModal   from '../components/ReprogramModal';
  * ScheduleAppointments — Componente orquestador de la agenda.
  *
  * Responsabilidades de este archivo:
- *   1. Controlar la fecha del calendario y el modo de vista (día / semana)
- *   2. Controlar qué panel se muestra (calendario | formulario)
- *   3. Controlar la apertura del modal de reprogramación
- *   4. Pasar datos y callbacks a los componentes hijos
+ *   1. Controlar la fecha seleccionada en el calendario (date)
+ *   2. Controlar la vista activa (día / semana) y la visibilidad del formulario
+ *   3. Instanciar useAgenda y pasar sus datos/acciones a los componentes hijos
  *
  * Toda la lógica de fetch y CRUD vive en useAgenda.
+ * Toda la UI de cada pieza vive en su propio componente.
  */
 const ScheduleAppointments = () => {
-  const [date,              setDate]              = useState(new Date());
-  const [showForm,          setShowForm]          = useState(false);
-  const [viewMode,          setViewMode]          = useState('dia');
-  const [showReprogramModal, setShowReprogramModal] = useState(false);
+  const [date, setDate]         = useState(new Date());
+  const [showForm, setShowForm] = useState(false);
+  const [viewMode, setViewMode] = useState('dia');
+  const [showReprogram, setShowReprogram] = useState(false);
 
-  // ── Hook central ───────────────────────────────────────────────────────────
+  // ── Hook principal ─────────────────────────────────────────────────────────
   const agenda = useAgenda(date);
 
-  // ── Handlers de UI ─────────────────────────────────────────────────────────
+  // ── Handlers de apertura ───────────────────────────────────────────────────
 
   const handleNuevaCita = () => {
     agenda.prepararNuevaCita();
@@ -46,18 +46,10 @@ const ScheduleAppointments = () => {
 
   const handleAbrirReprogram = (cita) => {
     agenda.setSelectedCita(cita);
-    setShowReprogramModal(true);
+    setShowReprogram(true);
   };
 
-  const handleConfirmarReprogram = (reprogramData) => {
-    agenda.handleReprogramar(
-      agenda.selectedCita.idCitas,
-      reprogramData,
-      () => setShowReprogramModal(false)
-    );
-  };
-
-  // Marca los días con citas en el calendario con un punto azul
+  // ── Tile del calendario: punto en días con citas ───────────────────────────
   const tileContent = ({ date: tileDate, view }) => {
     if (view !== 'month') return null;
     const key = tileDate.toISOString().split('T')[0];
@@ -144,12 +136,11 @@ const ScheduleAppointments = () => {
             </div>
 
             <div className="appointment-list-scroll">
-
               {agenda.loading && !agenda.appointments.length && (
                 <p className="text-muted small text-center p-3">Cargando citas...</p>
               )}
 
-              {/* VISTA DÍA */}
+              {/* ── VISTA DÍA ─────────────────────────────────────────────── */}
               {viewMode === 'dia' && (
                 <>
                   {agenda.citasDelDia.length === 0 && !agenda.loading && (
@@ -159,7 +150,6 @@ const ScheduleAppointments = () => {
                     <AppointmentCard
                       key={app.idCitas}
                       app={app}
-                      compact={false}
                       onEditar={handleEditarCita}
                       onCancelar={agenda.handleCancelar}
                       onReprogram={handleAbrirReprogram}
@@ -168,7 +158,7 @@ const ScheduleAppointments = () => {
                 </>
               )}
 
-              {/* VISTA SEMANA */}
+              {/* ── VISTA SEMANA ───────────────────────────────────────────── */}
               {viewMode === 'semana' && (
                 <div className="weekly-view">
                   {Object.keys(agenda.citasPorFecha).sort().map(fechaKey => (
@@ -180,7 +170,7 @@ const ScheduleAppointments = () => {
                         <AppointmentCard
                           key={app.idCitas}
                           app={app}
-                          compact={true}
+                          compact
                           onEditar={handleEditarCita}
                           onCancelar={agenda.handleCancelar}
                         />
@@ -197,13 +187,19 @@ const ScheduleAppointments = () => {
         </div>
       </main>
 
-      {/* MODAL DE REPROGRAMACIÓN */}
-      {showReprogramModal && (
+      {/* ── MODAL DE REPROGRAMACIÓN ──────────────────────────────────────── */}
+      {showReprogram && (
         <ReprogramModal
           cita={agenda.selectedCita}
           loading={agenda.loading}
-          onConfirmar={handleConfirmarReprogram}
-          onCerrar={() => setShowReprogramModal(false)}
+          onConfirmar={(reprogramData) =>
+            agenda.handleReprogramar(
+              agenda.selectedCita.idCitas,
+              reprogramData,
+              () => setShowReprogram(false)
+            )
+          }
+          onCerrar={() => setShowReprogram(false)}
         />
       )}
     </div>
