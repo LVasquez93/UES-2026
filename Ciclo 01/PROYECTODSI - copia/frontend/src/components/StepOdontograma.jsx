@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Odontogram } from 'react-odontogram';
-// IMPORTANTE: mantener este import — proviene del paquete npm, no del CSS propio
 import 'react-odontogram/style.css';
+import '../styles/Odontograma.css';
 import HallazgosList from './HallazgosList';
 import TratamientoSelector from './TratamientoSelector';
 import Button from './ui/Button';
@@ -9,17 +9,11 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const FILTERS = ['Hallazgos', 'Presupuestado', 'Programado', 'Realizado'];
 
-/**
- * Paso 2: Odontograma y registro de hallazgos.
- * FIX BUG-07: props de TratamientoSelector alineadas con su nueva interfaz.
- */
 const StepOdontograma = ({
   cita,
-  // Hallazgos
   hallazgos,
   onCambiarEstado,
   onEliminarHallazgo,
-  // Tratamientos
   tratamientos,
   selectedTeeth,
   selectedTratamiento, setSelectedTratamiento,
@@ -27,8 +21,7 @@ const StepOdontograma = ({
   savingHallazgo,
   onOdontogramChange,
   onRegistrarHallazgo,
-  onCrearTratamiento,
-  // Navegación
+  onCrearNuevoTratamiento,
   onVolver,
   onContinuar,
 }) => {
@@ -36,14 +29,26 @@ const StepOdontograma = ({
   const showHistorial = activeFilter === 'Programado' || activeFilter === 'Realizado';
   const piecesText = selectedTeeth.map(t => t.notations?.fdi || t.id).join(', ');
 
+  // Hallazgos existentes → rojo en el odontograma.
+  // Formato de ID: "teeth-XX" donde XX = piezaDental (FDI).
+  const teethConditions = useMemo(() => {
+    if (!hallazgos?.length) return [];
+    return [{
+      label: 'Hallazgo registrado',
+      teeth: hallazgos.map(h => `teeth-${h.piezaDental}`),
+      fillColor:    '#fee2e2',
+      outlineColor: '#ef4444',
+    }];
+  }, [hallazgos]);
+
   return (
     <div className="flex gap-4 mt-4 flex-1 overflow-hidden animate-fade-in">
 
-      {/* ── COLUMNA IZQUIERDA: Odontograma ──────────────────────────────── */}
+      {/* ── COLUMNA IZQUIERDA ───────────────────────────────────── */}
       <div className="flex-1 flex flex-col bg-white rounded-2xl border border-slate-200
                       shadow-card overflow-hidden min-w-0">
 
-        {/* Barra de filtros */}
+        {/* Barra de filtros — altura fija */}
         <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-100 flex-shrink-0">
           <i className="bi bi-funnel text-slate-400 text-sm" />
           <span className="text-xs text-slate-400">Filtros:</span>
@@ -62,7 +67,7 @@ const StepOdontograma = ({
           ))}
         </div>
 
-        {/* Contenido principal */}
+        {/* Contenido principal — ocupa toda la altura disponible con scroll */}
         <div className="flex-1 overflow-y-auto p-4">
           {showHistorial ? (
             <div>
@@ -82,20 +87,44 @@ const StepOdontograma = ({
             </div>
           ) : (
             <>
-              <Odontogram
-                onChange={onOdontogramChange}
-                theme="light"
-                notation="FDI"
-              />
-              <p className="text-center text-xs text-slate-400 mt-3">
+              {/* Leyenda de colores — compacta para no robar altura al odontograma */}
+              <div className="flex items-center gap-4 mb-2 px-1">
+                <span className="flex items-center gap-1.5 text-xs text-slate-500">
+                  <span className="w-2.5 h-2.5 rounded-full bg-red-400 border border-red-600 flex-shrink-0" />
+                  Hallazgo registrado
+                </span>
+                <span className="flex items-center gap-1.5 text-xs text-slate-500">
+                  <span className="w-2.5 h-2.5 rounded-full bg-blue-400 border border-blue-600 flex-shrink-0" />
+                  Selección actual
+                </span>
+              </div>
+
+              {/* Odontograma.
+                  .odontograma-fit aplica el max-width responsivo definido en
+                  OdontogramResponsive.css según la altura del viewport.
+                  El SVG ya tiene width:100% y height:auto internamente. */}
+              <div className="odontograma-fit">
+                <Odontogram
+                  onChange={onOdontogramChange}
+                  theme="light"
+                  notation="FDI"
+                  teethConditions={teethConditions}
+                  showLabels={hallazgos?.length > 0}
+                />
+              </div>
+
+              <p className="text-center text-xs text-slate-400 mt-2">
                 Selecciona piezas y registra el tratamiento en el panel derecho
               </p>
             </>
           )}
         </div>
 
-        {/* Lista de hallazgos */}
-        <div className="border-t border-slate-100 px-4 pb-4 max-h-64 overflow-y-auto">
+        {/* Hallazgos — altura reducida de max-h-64 (256px) a max-h-40 (160px)
+            para liberar ~96px de altura adicional al odontograma.
+            Con esto el odontograma gana casi 1 fila entera de dientes visible.
+            Si tienes muchos hallazgos y quieres ver más, sube a max-h-52 (208px). */}
+        <div className="border-t border-slate-100 px-4 pb-4 max-h-40 overflow-y-auto">
           <HallazgosList
             hallazgos={hallazgos}
             onCambiarEstado={onCambiarEstado}
@@ -104,13 +133,12 @@ const StepOdontograma = ({
         </div>
       </div>
 
-      {/* ── COLUMNA DERECHA: Panel de registro ──────────────────────────── */}
+      {/* ── COLUMNA DERECHA: Panel de registro ──────────────────── */}
       <aside className="w-72 flex-shrink-0 flex flex-col bg-white rounded-2xl
                         border border-slate-200 shadow-card p-4 gap-4 overflow-y-auto">
 
         <h6 className="font-bold text-slate-800 text-sm">Registrar hallazgo</h6>
 
-        {/* Piezas seleccionadas */}
         <div>
           <label className="block text-xs font-medium text-slate-600 mb-1">
             Piezas seleccionadas (FDI)
@@ -125,7 +153,6 @@ const StepOdontograma = ({
           />
         </div>
 
-        {/* Selector de tratamiento — FIX BUG-07 */}
         <div>
           <label className="block text-xs font-medium text-slate-600 mb-1">Tratamiento</label>
           <TratamientoSelector
@@ -136,12 +163,11 @@ const StepOdontograma = ({
               const t = tratamientos.find(tr => String(tr.idTratamiento) === id);
               if (t) setCustomPrecio(String(t.costoTratamiento));
             }}
-            onCrear={onCrearTratamiento}
+            onCrear={onCrearNuevoTratamiento}
             crearLoading={savingHallazgo}
           />
         </div>
 
-        {/* Precio aplicado */}
         <div>
           <label className="block text-xs font-medium text-slate-600 mb-1">Precio aplicado ($)</label>
           <input
@@ -157,7 +183,6 @@ const StepOdontograma = ({
           />
         </div>
 
-        {/* Botón registrar */}
         <Button
           fullWidth
           onClick={onRegistrarHallazgo}

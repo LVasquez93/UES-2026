@@ -4,15 +4,22 @@ import StatusBadge from './ui/StatusBadge';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 /**
- * Tarjeta de cita.
+ * Tarjeta de citas con dos modos de visualización.
  * compact=false → vista día (con línea de tiempo lateral)
  * compact=true  → vista semana (compacta, sin línea)
  */
 const AppointmentCard = ({ app, compact = false, onEditar, onCancelar, onReprogram }) => {
+  // Determina si el botón de cancelar debe mostrarse.
+  // Los estados en este array indican citas que ya no pueden ser canceladas.
   const canCancel = !['CANCELADA', 'COMPLETADA', 'FINALIZADA'].includes(app.estadoCita);
-
+//app> Objeto cita con campos: nombreCompletoPaciente, estadoCita, horaInicioCita, especialidadOdontologo.
+//compact> Activa el modo compacto. Default: false
+//onEditar> Callback al presionar el botón de editar. Recibe el objeto `app`.
+//onCancelar> Callback al presionar el botón de cancelar. Recibe el objeto `app`.
+//onReprogram> Callback al presionar el botón de reprogramar. Recibe el objeto `app`.
   const Actions = () => (
     <div className="flex items-center gap-0.5">
+      {/* Botón Editar: siempre visible. Para cambiar ícono, edita 'bi-pencil'. */}
       <button
         onClick={() => onEditar?.(app)}
         aria-label="Editar cita"
@@ -22,6 +29,7 @@ const AppointmentCard = ({ app, compact = false, onEditar, onCancelar, onReprogr
       >
         <i className="bi bi-pencil text-xs" />
       </button>
+      {/* Botón Cancelar: visible solo si `canCancel` es true (el estado permite cancelación).*/}
       {canCancel && (
         <button
           onClick={() => onCancelar?.(app)}
@@ -33,6 +41,7 @@ const AppointmentCard = ({ app, compact = false, onEditar, onCancelar, onReprogr
           <i className="bi bi-trash text-xs" />
         </button>
       )}
+      {/* Botón Reprogramar: visible solo si el padre pasa el prop `onReprogram` Para que aparezca condicionalmente por estado, agrega otra condición aquí. */}
       {onReprogram && (
         <button
           onClick={() => onReprogram?.(app)}
@@ -46,7 +55,7 @@ const AppointmentCard = ({ app, compact = false, onEditar, onCancelar, onReprogr
       )}
     </div>
   );
-
+// Para modificar qué datos se muestran en modo compacto, edita este bloque.
   if (compact) {
     return (
       <div className="flex items-center justify-between gap-3 p-3 rounded-xl

@@ -2,14 +2,14 @@ import React from 'react';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 /**
- * Barra de búsqueda reutilizable con ícono y botón de limpiar.
+ * Barra de búsqueda reutilizable con ícono lupa y botón de limpiar.
  */
 const SearchInput = ({
-  value,
-  onChange,
-  onClear,
-  placeholder = 'Buscar...',
-  className = '',
+  value, //Valor actual del input (controlado desde el padre).
+  onChange, //Callback al escribir: recibe el evento nativo (e.target.value).
+  onClear, //Callback al presionar X para limpiar. Si no se pasa, el botón X no aparece.
+  placeholder = 'Buscar...', //Texto de placeholder. Default: 'Buscar...'
+  className = '', //Clases adicionales para ajustar tamaño o margen externo.
 }) => (
   <div className={`flex items-center gap-2 px-3 py-2.5 bg-white border border-slate-200
                    rounded-xl hover:border-primary-300 focus-within:ring-2
