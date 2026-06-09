@@ -1,0 +1,149 @@
+.global _start          @ Declara '_start' como punto de entrada (donde empieza a ejecutar)
+
+@ ============================================================
+@ LEYENDA DE REGISTROS (qué guarda cada uno en este programa):
+@   r0 = dirección temporal con la que vamos a trabajar (un "puntero")
+@   r1 = valor leído (de los botones o de los switches)
+@   r2 = máscara para limpiar un bit concreto
+@   r3 = dirección de la variable 'indice'
+@   r4 = valor de 'indice' (cuántos datos llevamos, 0 a 8)
+@   r5 = dato leído del puerto paralelo
+@   r6 = dirección base del arreglo
+@   r7 = resultado final (mayor/menor/suma/promedio)
+@   r8 = contador del bucle (0 a 7)
+@   r9 = elemento actual del arreglo dentro del bucle
+@ ============================================================
+
+@ ===== Direcciones de los periféricos (constantes con nombre) =====
+.equ LEDS,      0xFF200000   @ Define LEDS = dirección de los LEDs
+.equ SW,        0xFF200040   @ Define SW   = dirección de los switches
+.equ KEY_EDGE,  0xFF20005C   @ Define KEY_EDGE = registro que detecta pulsaciones
+.equ PPORT,     0xFF200060   @ Define PPORT = dirección del puerto paralelo
+
+.data                        @ Aquí empiezan las VARIABLES (van en memoria RAM)
+arreglo:   .space 32         @ Reserva 32 bytes (8 datos x 4 bytes c/u), todos en 0
+indice:    .word 0           @ Reserva 1 palabra de 32 bits con valor inicial 0
+
+.text                        @ Aquí empieza el CÓDIGO (las instrucciones)
+_start:                      @ Etiqueta: primera instrucción del programa
+    LDR r0, =KEY_EDGE        @ r0 = dirección del registro edgecapture (0xFF20005C)
+    MOV r1, #0xF             @ r1 = 0x0000000F (en binario 1111: los 4 botones)
+    STR r1, [r0]             @ Escribe 1111 en edgecapture -> borra pulsaciones viejas
+
+@ ===================== BUCLE PRINCIPAL =====================
+main_loop:                   @ Etiqueta: aquí vuelve siempre a "vigilar" los botones
+    LDR r0, =KEY_EDGE        @ r0 = dirección de edgecapture
+    LDR r1, [r0]             @ r1 = valor EN esa dirección = qué botones se pulsaron
+    TST r1, #0b001           @ Prueba el bit 0 (calcula r1 AND 1 y revisa si es 0)
+    BNE boton0               @ Si el bit 0 estaba en 1 (no-cero), salta a boton0
+    TST r1, #0b010           @ Prueba el bit 1 (botón 1)
+    BNE boton1               @ Si el botón 1 fue pulsado, salta a boton1
+    TST r1, #0b100           @ Prueba el bit 2 (botón 2)
+    BNE boton2               @ Si el botón 2 fue pulsado, salta a boton2
+    B main_loop              @ Si nadie pulsó nada, vuelve a vigilar (bucle infinito)
+
+@ ---------- BOTÓN 0: guardar un dato del puerto ----------
+boton0:
+    LDR r0, =KEY_EDGE        @ r0 = dirección de edgecapture
+    MOV r2, #0b001           @ r2 = 1 (máscara solo para el bit 0)
+    STR r2, [r0]             @ Escribe 1 en el bit 0 -> "marca como atendido" el botón 0
+    LDR r3, =indice          @ r3 = dirección de la variable 'indice'
+    LDR r4, [r3]             @ r4 = valor actual de 'indice' (cuántos datos llevamos)
+    CMP r4, #8               @ Compara indice con 8 (calcula r4 - 8 y guarda banderas)
+    BGE main_loop            @ Si indice >= 8 (ya hay 8 datos), no guarda y se va
+    LDR r0, =PPORT           @ r0 = dirección del puerto paralelo
+    LDR r5, [r0]             @ r5 = valor que pusiste en el puerto = el dato a guardar
+    LDR r6, =arreglo         @ r6 = dirección base del arreglo
+    STR r5, [r6, r4, LSL #2] @ Guarda r5 en arreglo[indice]; (r6 + indice*4), LSL#2 = x4
+    ADD r4, r4, #1           @ indice = indice + 1
+    STR r4, [r3]             @ Guarda el nuevo valor de indice de vuelta en memoria
+    B main_loop              @ Vuelve a vigilar botones
+
+@ ---------- BOTÓN 1: calcular según switches y mostrar ----------
+boton1:
+    LDR r0, =KEY_EDGE        @ r0 = dirección de edgecapture
+    MOV r2, #0b010           @ r2 = máscara del bit 1
+    STR r2, [r0]             @ Marca como atendido el botón 1
+    LDR r3, =indice          @ r3 = dirección de 'indice'
+    LDR r4, [r3]             @ r4 = valor de 'indice'
+    CMP r4, #8               @ ¿Ya hay 8 datos?
+    BLT main_loop            @ Si hay menos de 8, no hace nada y vuelve al bucle
+    LDR r0, =SW              @ r0 = dirección de los switches
+    LDR r1, [r0]             @ r1 = estado de los switches
+    AND r1, r1, #0b11        @ Deja solo los 2 bits de abajo (SW1 y SW0), borra el resto
+    CMP r1, #0b00            @ ¿Es 00?
+    BEQ calc_mayor           @ Si es 00 -> calcular el MAYOR
+    CMP r1, #0b01            @ ¿Es 01?
+    BEQ calc_menor           @ Si es 01 -> calcular el MENOR
+    CMP r1, #0b10            @ ¿Es 10?
+    BEQ calc_promedio        @ Si es 10 -> calcular el PROMEDIO
+    B calc_suma              @ En cualquier otro caso (11) -> calcular la SUMA
+
+calc_mayor:
+    LDR r6, =arreglo         @ r6 = dirección base del arreglo
+    LDR r7, [r6]             @ r7 = arreglo[0] (lo tomamos como mayor provisional)
+    MOV r8, #1               @ r8 = 1 (empezamos a comparar desde el elemento 1)
+m_loop:
+    LDR r9, [r6, r8, LSL #2] @ r9 = arreglo[r8] (elemento actual)
+    CMP r9, r7               @ Compara el elemento con el mayor que llevamos
+    MOVGT r7, r9             @ Si r9 > r7, copia r9 en r7 (nuevo mayor). Solo si es mayor
+    ADD r8, r8, #1           @ Avanza al siguiente elemento
+    CMP r8, #8               @ ¿Ya recorrimos los 8?
+    BLT m_loop               @ Si todavía no, repite el bucle
+    B mostrar                @ Listo: el mayor quedó en r7, ir a mostrar
+
+calc_menor:
+    LDR r6, =arreglo         @ r6 = base del arreglo
+    LDR r7, [r6]             @ r7 = arreglo[0] (menor provisional)
+    MOV r8, #1               @ Empezar desde el elemento 1
+n_loop:
+    LDR r9, [r6, r8, LSL #2] @ r9 = arreglo[r8]
+    CMP r9, r7               @ Compara elemento con el menor que llevamos
+    MOVLT r7, r9             @ Si r9 < r7, copia r9 en r7 (nuevo menor)
+    ADD r8, r8, #1           @ Siguiente elemento
+    CMP r8, #8               @ ¿Llegamos a 8?
+    BLT n_loop               @ Si no, repite
+    B mostrar                @ El menor quedó en r7
+
+calc_suma:
+    LDR r6, =arreglo         @ r6 = base del arreglo
+    MOV r7, #0               @ r7 = 0 (acumulador donde sumaremos)
+    MOV r8, #0               @ r8 = 0 (contador, sumamos desde el primer elemento)
+s_loop:
+    LDR r9, [r6, r8, LSL #2] @ r9 = arreglo[r8]
+    ADD r7, r7, r9           @ acumulador = acumulador + elemento
+    ADD r8, r8, #1           @ Siguiente elemento
+    CMP r8, #8               @ ¿Sumamos los 8?
+    BLT s_loop               @ Si no, repite
+    B mostrar                @ La suma quedó en r7
+
+calc_promedio:
+    LDR r6, =arreglo         @ r6 = base del arreglo
+    MOV r7, #0               @ Acumulador en 0
+    MOV r8, #0               @ Contador en 0
+p_loop:
+    LDR r9, [r6, r8, LSL #2] @ r9 = arreglo[r8]
+    ADD r7, r7, r9           @ Sumar al acumulador
+    ADD r8, r8, #1           @ Siguiente elemento
+    CMP r8, #8               @ ¿Van los 8?
+    BLT p_loop               @ Si no, repite
+    MOV r7, r7, LSR #3       @ Divide la suma entre 8 (correr 3 bits a la derecha = /8)
+    B mostrar                @ El promedio quedó en r7
+
+@ ---------- Mostrar resultado en los LEDs ----------
+mostrar:
+    LDR r0, =LEDS            @ r0 = dirección de los LEDs
+    STR r7, [r0]             @ Escribe el resultado (r7) en los LEDs -> se ve en binario
+    B main_loop              @ Vuelve a vigilar botones
+
+@ ---------- BOTÓN 2: reiniciar ----------
+boton2:
+    LDR r0, =KEY_EDGE        @ r0 = dirección de edgecapture
+    MOV r2, #0b100           @ Máscara del bit 2
+    STR r2, [r0]             @ Marca como atendido el botón 2
+    LDR r3, =indice          @ r3 = dirección de 'indice'
+    MOV r4, #0               @ r4 = 0
+    STR r4, [r3]             @ indice = 0 (volvemos a llenar desde el principio)
+    LDR r0, =LEDS            @ r0 = dirección de los LEDs
+    STR r4, [r0]             @ Escribe 0 en los LEDs -> los apaga
+    B main_loop              @ Vuelve a vigilar botones
