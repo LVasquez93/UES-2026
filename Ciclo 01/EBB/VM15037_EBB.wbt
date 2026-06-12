@@ -1,0 +1,51 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/RectangleArena.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/gctronic/e-puck/protos/E-puck.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/BrushedAluminium.proto"
+
+WorldInfo {
+}
+Viewpoint {
+  orientation 0.28644246184268896 0.3155748644685543 -0.9046343023394334 1.5741526941289086
+  position -0.09771582963794227 3.8429495384590253 2.3198932494954505
+  followType "None"
+}
+TexturedBackground {
+  texture "stadium_dry"
+  luminosity 0
+  skyColor [
+    1 0 0.498039
+  ]
+}
+TexturedBackgroundLight {
+  texture "stadium"
+}
+RectangleArena {
+  floorSize 3 3
+  floorAppearance Appearance {
+    material Material {
+      ambientIntensity 0.7
+      diffuseColor 0.913725 0.913725 0.913725
+      emissiveColor 0.529412 0.517647 0.501961
+    }
+    texture ImageTexture {
+      filtering 1
+    }
+    textureTransform TextureTransform {
+    }
+  }
+  wallThickness 0
+  wallHeight 0.05
+  wallAppearance BrushedAluminium {
+    colorOverride 0.266667 0.203922 0.129412
+  }
+}
+E-puck {
+  translation 1.44935 1.44712 -6.4299e-05
+  rotation -0.0007700780857844959 -0.00015354365187675246 0.9999996917019968 -2.593549403971208
+  camera_width 500
+  camera_height 360
+}
