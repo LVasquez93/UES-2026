@@ -1,0 +1,8 @@
+{
+	"folders": [
+		{
+			"name": "pi — (Remote)",
+			"uri": "sftp://raspberry/"
+		}
+	]
+}
