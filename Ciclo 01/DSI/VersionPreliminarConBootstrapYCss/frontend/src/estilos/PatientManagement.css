@@ -1,0 +1,151 @@
+.patient-layout {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 30px;
+  height: calc(100vh - 120px);
+  overflow: hidden;
+}
+
+/* --- DIRECTORIO (IZQUIERDA) --- */
+.directory-module {
+  background: white;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.directory-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--border-color);
+  background: #f8fafc;
+}
+
+.search-bar-full {
+  display: flex;
+  align-items: center;
+  background: white;
+  padding: 10px 15px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  gap: 10px;
+}
+
+.search-bar-full input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 0.9rem;
+}
+
+.patient-list {
+  overflow-y: auto;
+  flex-grow: 1;
+  padding: 15px;
+}
+
+.patient-card-item {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+
+.patient-card-item:hover {
+  background: #f8fafc;
+  border-color: var(--border-color);
+}
+
+.patient-card-item.selected {
+  background: #eef2ff;
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.1);
+}
+
+.patient-avatar-sm {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  margin-right: 15px;
+}
+
+.patient-brief {
+  flex-grow: 1;
+}
+
+/* --- FORMULARIO (DERECHA) --- */
+.form-module {
+  overflow-y: auto;
+}
+
+.form-card {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+}
+
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-new-patient {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: 0.2s;
+}
+
+.btn-new-patient:hover { background: var(--primary-dark); }
+
+/* Botones de acción del formulario */
+.btn-save {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+.btn-cancel {
+  background: white;
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  padding: 12px 25px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.btn-delete {
+  background: #fef2f2;
+  color: #ef4444;
+  border: 1px solid #fca5a5;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  margin-right: auto; /* Empuja este botón a la izquierda */
+}
+
+textarea.form-control-custom {
+  resize: none;
+}

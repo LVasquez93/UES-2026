@@ -1,0 +1,280 @@
+:root {
+  --primary-color: #6366f1;
+  --bg-app: #f8fafc;
+  --sidebar-width: 80px;
+  --text-main: #1e293b;
+  --text-light: #64748b;
+  --border-color: #e2e8f0;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-app);
+}
+
+.app-container {
+  display: flex;
+  height: 100vh;
+}
+
+/* SIDEBAR */
+.app-sidebar {
+  width: var(--sidebar-width);
+  background: white;
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+}
+
+.sidebar-logo {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary-color);
+  margin-bottom: 40px;
+}
+
+.sidebar-menu {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.sidebar-menu i {
+  font-size: 1.5rem;
+  color: #cbd5e0;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.sidebar-menu i.active {
+  color: var(--primary-color);
+}
+
+/* HEADER */
+.app-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.app-header {
+  height: 70px;
+  background: white;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 30px;
+}
+
+.patient-pill {
+  display: flex;
+  align-items: center;
+  background: #f1f5f9;
+  padding: 5px 15px;
+  border-radius: 50px;
+  gap: 10px;
+}
+
+.patient-pill img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+}
+
+.patient-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-main);
+}
+
+.doctor-avatar {
+  width: 35px;
+  height: 35px;
+  background: #e2e8f0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.8rem;
+}
+
+/* BODY & TABS */
+.app-body {
+  padding: 20px 30px;
+  flex-grow: 1;
+}
+
+.body-tabs {
+  display: flex;
+  gap: 30px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 20px;
+}
+
+.body-tabs button {
+  background: none;
+  border: none;
+  padding: 10px 5px;
+  color: var(--text-light);
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+}
+
+.body-tabs button.active {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+}
+
+/* WORKSPACE CARD */
+.workspace-card {
+  background: white;
+  border-radius: 15px;
+  display: flex;
+  height: calc(100% - 80px);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+.odontogram-section {
+  flex-grow: 1;
+  padding: 25px;
+  border-right: 1px solid var(--border-color);
+  overflow-y: auto;
+}
+
+.filters-bar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.filter-pill {
+  border: 1px solid var(--border-color);
+  background: white;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  color: var(--text-light);
+  cursor: pointer;
+}
+
+.filter-pill.active {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+/* 1. Centramos el contenedor principal */
+.odontogram-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+  width: 100%;
+}
+
+/* CONTROL PANEL */
+.control-panel {
+  width: 350px;
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label-custom {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 8px;
+}
+
+.form-control-custom {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: #f8fafc;
+  font-weight: 600;
+}
+
+.cara-selector {
+  width: 45px;
+  height: 45px;
+  border: 2px solid var(--primary-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  color: var(--primary-color);
+  font-size: 1.5rem;
+}
+
+/* TREATMENT DROPDOWN */
+.treatment-dropdown {
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.dropdown-header {
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  background: white;
+  font-size: 0.9rem;
+}
+
+.dropdown-content .item {
+  padding: 10px 15px;
+  font-size: 0.85rem;
+  color: var(--text-light);
+}
+
+.dropdown-content .item.active {
+  background: #f1f5f9;
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.btn-register {
+  margin-top: auto;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 12px;
+  font-weight: 700;
+  transition: 0.3s;
+}
+
+.btn-register:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Estilos para el Odontograma SVG */
+/*Controlamos el tamaño del envoltorio de la librería */
+.custom-odontogram {
+  width: 100% !important;
+  max-width: 650px; /* Controla qué tan ancho se puede hacer como máximo */
+  height: auto !important;
+  margin: 0 auto; /* Asegura que se centre horizontalmente */
+}
+/*Forzamos al SVG interno a escalar proporcionalmente sin desbordarse */
+.custom-odontogram svg {
+  width: 100% !important;
+  height: auto !important;
+  max-height: 55vh; /* Evita que crezca más del 55% del alto de tu pantalla */
+  object-fit: contain; /* Mantiene la proporción de los dientes intacta */
+}

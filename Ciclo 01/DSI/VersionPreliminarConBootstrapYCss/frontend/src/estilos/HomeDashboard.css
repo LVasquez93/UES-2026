@@ -1,0 +1,127 @@
+/* Variables compartidas (si ya las tienes en index.css o App.css, no es necesario repetirlas) */
+:root {
+  --primary-color: #6366f1;
+  --secondary-color: #14b8a6;
+  --accent-color: #8b5cf6;
+  --dark-color: #334155;
+  --bg-app: #f8fafc;
+  --sidebar-width: 80px;
+  --text-main: #1e293b;
+  --text-light: #64748b;
+  --border-color: #e2e8f0;
+}
+
+/* Reutilización del layout base */
+.app-container { display: flex; height: 100vh; background-color: var(--bg-app); font-family: 'Inter', sans-serif; }
+.app-sidebar { width: var(--sidebar-width); background: white; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; padding: 20px 0; z-index: 10; }
+.sidebar-logo { font-size: 1.8rem; font-weight: 800; color: var(--primary-color); margin-bottom: 40px; }
+.sidebar-menu { flex-grow: 1; display: flex; flex-direction: column; gap: 30px; }
+.sidebar-menu i { font-size: 1.5rem; color: #cbd5e0; cursor: pointer; transition: 0.3s; }
+.sidebar-menu i:hover, .sidebar-menu i.active { color: var(--primary-color); }
+.app-content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+/* HEADER DASHBOARD */
+.app-header { height: 70px; background: white; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; padding: 0 40px; }
+.header-right { display: flex; align-items: center; gap: 20px; }
+.search-bar { display: flex; align-items: center; background: #f1f5f9; padding: 8px 15px; border-radius: 20px; gap: 10px; width: 300px; }
+.search-bar i { color: var(--text-light); }
+.search-bar input { border: none; background: transparent; outline: none; width: 100%; font-size: 0.9rem; }
+.doctor-avatar { width: 35px; height: 35px; background: var(--primary-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.8rem; }
+
+/* BODY DASHBOARD */
+.dashboard-body { padding: 40px; flex-grow: 1; overflow-y: auto; }
+
+/* QUICK ACTIONS GRID */
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.action-card {
+  background: white;
+  border-radius: 16px;
+  padding: 25px 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid transparent;
+}
+
+.action-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.card-icon {
+  width: 55px;
+  height: 55px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+}
+
+.action-card.primary .card-icon { background: #e0e7ff; color: var(--primary-color); }
+.action-card.secondary .card-icon { background: #ccfbf1; color: var(--secondary-color); }
+.action-card.accent .card-icon { background: #ede9fe; color: var(--accent-color); }
+.action-card.dark .card-icon { background: #f1f5f9; color: var(--dark-color); }
+
+.action-card:hover.primary { border-color: var(--primary-color); }
+.action-card:hover.secondary { border-color: var(--secondary-color); }
+.action-card:hover.accent { border-color: var(--accent-color); }
+
+.card-info h5 { margin: 0; font-weight: 700; font-size: 1.05rem; color: var(--text-main); }
+.card-info span { font-size: 0.8rem; color: var(--text-light); }
+
+/* WIDGETS GRIDS */
+.dashboard-widgets {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 25px;
+}
+
+.widget-card {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  padding: 25px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+}
+
+.widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+/* LISTA DE CITAS */
+.appointment-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 15px; }
+.appointment-item { display: flex; align-items: center; padding: 15px; border: 1px solid var(--border-color); border-radius: 12px; background: #fdfdfd; }
+.appointment-item .time { font-weight: 700; color: var(--primary-color); width: 90px; font-size: 0.95rem; }
+.appointment-item .details { flex-grow: 1; padding: 0 15px; border-left: 2px solid #f1f5f9; }
+.appointment-item .details h6 { margin: 0 0 4px 0; font-weight: 700; color: var(--text-main); }
+.appointment-item .details span { font-size: 0.85rem; color: var(--text-light); }
+.appointment-item .status { padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+.status.pending { background: #fef3c7; color: #d97706; }
+.status.confirmed { background: #d1fae5; color: #059669; }
+
+/* ESTADÍSTICAS */
+.stats-grid { display: flex; flex-direction: column; gap: 15px; }
+.stat-box { display: flex; flex-direction: column; padding: 15px; border-radius: 12px; background: #f8fafc; border: 1px solid var(--border-color); text-align: center; }
+.stat-value { font-size: 2rem; font-weight: 800; line-height: 1; margin-bottom: 5px; }
+.stat-label { font-size: 0.85rem; font-weight: 600; color: var(--text-light); }

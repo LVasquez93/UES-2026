@@ -1,0 +1,177 @@
+/* Variables base (puedes omitirlas si ya están globales en tu index.css) */
+:root {
+  --primary-color: #6366f1;
+  --primary-dark: #4f46e5;
+  --bg-app: #f8fafc;
+  --text-main: #1e293b;
+  --text-light: #64748b;
+  --border-color: #e2e8f0;
+}
+
+.login-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background-color: white;
+}
+
+/* --- SECCIÓN IZQUIERDA (Branding) --- */
+.login-branding {
+  flex: 1;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px;
+  color: white;
+  overflow: hidden;
+}
+
+/* Patrón de fondo sutil para darle textura */
+.login-branding::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+  background-size: 30px 30px;
+  transform: rotate(30deg);
+  pointer-events: none;
+}
+
+.branding-content {
+  position: relative;
+  z-index: 2;
+  max-width: 500px;
+}
+
+.logo-text {
+  font-size: 3.5rem;
+  font-weight: 900;
+  margin-bottom: 20px;
+  letter-spacing: -1px;
+}
+
+.branding-subtitle {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  line-height: 1.6;
+}
+
+/* --- SECCIÓN DERECHA (Formulario) --- */
+.login-form-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-app);
+}
+
+.form-wrapper {
+  width: 100%;
+  max-width: 450px;
+  padding: 40px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color);
+}
+
+.text-main {
+  color: var(--text-main);
+}
+
+/* Inputs personalizados con íconos */
+.form-label-custom {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 8px;
+}
+
+.input-group-custom {
+  display: flex;
+  align-items: center;
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 5px 15px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.input-group-custom i {
+  font-size: 1.2rem;
+  margin-right: 10px;
+  color: var(--text-light); /* usa la variable ya definida */
+}
+
+.form-control-custom {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 10px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-main);
+  outline: none;
+}
+
+.input-group-custom:focus-within {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.form-control-custom::placeholder {
+  color: #94a3b8;
+}
+
+
+/* Botones y enlaces */
+.forgot-password-link {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s;
+}
+
+.forgot-password-link:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+
+.btn-login {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.1s;
+}
+
+.btn-login:hover {
+  background: var(--primary-dark);
+}
+
+.btn-login:active {
+  transform: scale(0.98);
+}
+
+.btn-login:hover {
+  background: var(--primary-dark);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+
+/* Responsive: Ocultar branding en pantallas pequeñas */
+@media (max-width: 900px) {
+  .login-branding {
+    display: none;
+  }
+}

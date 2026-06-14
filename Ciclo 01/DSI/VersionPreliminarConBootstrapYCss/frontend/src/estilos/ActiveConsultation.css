@@ -1,0 +1,250 @@
+/* ============================================================
+   ActiveConsultation.css
+   Estilos exclusivos del modulo de consulta activa.
+   Reutiliza variables de DentalDashboard.css y PatientManagement.css
+   ============================================================ */
+
+/* ---- BANNER SUPERIOR DE CONSULTA ---- */
+.consultation-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 16px 24px;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* Punto de estado animado */
+.consultation-status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  animation: pulse-dot 1.5s infinite;
+  flex-shrink: 0;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.3); opacity: 0.7; }
+}
+
+/* ---- INDICADOR DE PASOS ---- */
+.steps-indicator {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.step-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  background: #f1f5f9;
+  color: var(--text-light);
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.step-pill.active {
+  background: var(--primary-color);
+  color: white;
+  box-shadow: 0 4px 10px rgba(99,102,241,0.3);
+}
+
+.step-pill.done {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.step-number {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+/* ---- LISTA DE HALLAZGOS EN EL ODONTOGRAMA ---- */
+.hallazgos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hallazgo-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  font-size: 0.82rem;
+}
+
+.hallazgo-pieza {
+  font-weight: 700;
+  color: var(--primary-color);
+  min-width: 70px;
+}
+
+.hallazgo-nombre {
+  flex-grow: 1;
+  color: var(--text-main);
+}
+
+.hallazgo-estado {
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.hallazgo-estado.pendiente  { background: #fef3c7; color: #92400e; }
+.hallazgo-estado.completado { background: #dcfce7; color: #166534; }
+.hallazgo-estado.cancelado  { background: #fee2e2; color: #991b1b; }
+
+.hallazgo-delete {
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  padding: 0 4px;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* ---- GRID DE ESTADISTICAS DEL DIA ---- */
+.consulta-stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.consulta-stat-card {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+}
+
+.consulta-stat-card .stat-value {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.consulta-stat-card .stat-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-light);
+}
+
+/* ---- GRID DE TARJETAS DE CITA ---- */
+.consulta-citas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding-bottom: 20px;
+}
+
+.consulta-cita-card {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.04);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.consulta-cita-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08);
+}
+
+.consulta-cita-hora {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  background: #eef2ff;
+  padding: 4px 10px;
+  border-radius: 8px;
+  margin-bottom: 14px;
+  display: inline-block;
+  width: fit-content;
+}
+
+/* ---- BUSCADOR CON DROPDOWN ---- */
+.search-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  z-index: 500;
+  overflow: hidden;
+}
+
+.search-dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.search-dropdown-item:hover {
+  background: #f8fafc;
+}
+
+/* ---- HISTORIAL DE CITAS EN MODAL ---- */
+.historial-item {
+  transition: border-color 0.2s;
+}
+
+.historial-item:hover {
+  border-color: var(--primary-color) !important;
+}
+
+/* ---- STATUS TAGS ADICIONALES ---- */
+.status-tag.cancel { background: #fee2e2; color: #991b1b; }
+
+/* ---- RECETA VISTA PREVIA ---- */
+.receta-item {
+  background: #f8fafc;
+  transition: border-color 0.2s;
+}
+
+.receta-item:hover {
+  border-color: var(--primary-color) !important;
+}
+
+.hallazgo-estado.pendiente   { background: #fef3c7; color: #92400e; }
+.hallazgo-estado.programado  { background: #e0e7ff; color: #3730a3; } /* Azul claro */
+.hallazgo-estado.en_progreso { background: #dbeafe; color: #1e40af; } /* Azul más fuerte */
+.hallazgo-estado.completado  { background: #dcfce7; color: #166534; } /* Verde */
+.hallazgo-estado.cancelado   { background: #fee2e2; color: #991b1b; } /* Rojo */
+.hallazgo-estado.otro        { background: #f3f4f6; color: #374151; } /* Gris */
