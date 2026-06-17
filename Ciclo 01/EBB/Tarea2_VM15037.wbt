@@ -5,12 +5,13 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/RectangleArena.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/gctronic/e-puck/protos/E-puck.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/BrushedAluminium.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/Grass.proto"
 
 WorldInfo {
 }
 Viewpoint {
-  orientation 0.28644246184268896 0.3155748644685543 -0.9046343023394334 1.5741526941289086
-  position -0.09771582963794227 3.8429495384590253 2.3198932494954505
+  orientation -0.5773502691896258 0.5773502691896258 0.5773502691896258 2.0944
+  position -1.4338120996385685e-10 -1.4338357414005696e-10 7.997544718467073
   followType "None"
 }
 TexturedBackground {
@@ -24,7 +25,7 @@ TexturedBackgroundLight {
   texture "stadium"
 }
 RectangleArena {
-  floorSize 3 3
+  floorSize 2 2
   floorAppearance Appearance {
     material Material {
       ambientIntensity 0.7
@@ -43,9 +44,40 @@ RectangleArena {
     colorOverride 0.266667 0.203922 0.129412
   }
 }
+Solid {
+  translation 0.84 0.86 0.05
+  children [
+    DEF PARED_BASE Shape {
+      appearance Grass {
+        type "prickly"
+      }
+      geometry Box {
+        size 0.025 0.3 0.1
+      }
+    }
+  ]
+  boundingObject USE PARED_BASE
+}
+Solid {
+  translation 0.86 0.56 0.05
+  rotation 0 0 1 1.5708
+  children [
+    DEF PARED_BASE Shape {
+      appearance Grass {
+        type "prickly"
+      }
+      geometry Box {
+        size 0.025 0.3 0.1
+      }
+    }
+  ]
+  name "solid(1)"
+  boundingObject USE PARED_BASE
+}
 E-puck {
-  translation 1.44935 1.44712 -6.4299e-05
-  rotation -0.0007700780857844959 -0.00015354365187675246 0.9999996917019968 -2.593549403971208
+  translation 0.913737 0.916918 0.000654713
+  rotation -4.7020110934983e-05 -0.0012380102879113038 0.9999992325595237 -1.5084953071795866
+  controller "<generic>"
   camera_width 500
   camera_height 360
 }
