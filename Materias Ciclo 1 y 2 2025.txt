@@ -1,15 +1,15 @@
-CiCLO 1-2026
-
 ****************************************************
 CICLO 2-2026
-Comunicaciones I C8
-Sistemas Operativos C8
-Análisis Financiero C8
-Diseño de sistemas II C8
-Tecnica Electiva III C7	
+Comunicaciones I C8 ####
+Sistemas Operativos C8 ####
+Análisis Financiero C8 ####
+Diseño de sistemas II C8 ####
+Tecnica Electiva III C7	 ####
 
-Tecnología Orientada a Objetos
+Tecnología Orientada a Objetos C8 ####
+
 Comercio Electrónico
+
 Sistemas de Información Geográficos
 
 ****************************************************
