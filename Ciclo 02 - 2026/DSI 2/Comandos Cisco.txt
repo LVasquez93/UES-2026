@@ -1,0 +1,47 @@
+enable 			****Ingresa al modo privilegiado (administrador).
+configure terminal 	****Ingresa al modo de configuración global para realizar cambios estructurales.
+hostname XXXXXXX	****Cambia el nombre del router para identificarlo fácilmente en la red.
+interface gigabite 0/0  ****Ingresa a la configuración física de ese puerto específico.
+ip address XXX  XXX     ****Asigna la dirección IPv4 y la máscara de subred al puerto.
+description lan XXXXXX *****Añade una etiqueta de texto para documentar a dónde va conectado ese puerto.
+no shutdown		****Enciende administrativamente la interfaz para que comience a transmitir datos.
+show ip route		****Despliega la tabla de enrutamiento. Aquí verificas si el router conoce
+				 cómo llegar a las distintas redes.
+wr			*****Guarda la configuración activa en la memoria
+				no volátil (NVRAM) para que no se pierda al
+				 reiniciar. Es la abreviatura de write memory
+banner motd #		****Crea un mensaje del día (Message of the Day) 
+				que se mostrará como advertencia o bienvenida al intentar acceder al equipo.
+show running-config	****Muestra todo el archivo de configuración que está operando en este momento en
+				la memoria RAM.
+service password-encryption   ****Aplica un cifrado básico a todas las contraseñas que
+				 de otro modo aparecerían en texto plano dentro del archivo de configuración.
+line console 0		****Ingresa a la configuración del puerto físico de consola.
+password XXXXXX		****Establece la contraseña para la línea actual.
+login			****Obliga al router a solicitar la contraseña configurada al
+				 intentar conectarse por esa línea.
+enable secret XXXXX	****Establece una contraseña fuertemente encriptada
+				 para proteger el acceso al modo privilegiado.
+exec-timeout 5 0  	****Cierra la sesión (de consola o virtual) automáticamente tras 5 minutos
+				 segundos de inactividad. Es vital para la seguridad.
+ip domain-name XXXXXX	****Define el nombre de dominio de la red. Es un requisito
+				obligat ara poder generar certificados criptográficos.
+crypto key generate rsa ****Genera las claves de encriptación necesarias para habilitar el protocolo SSH.
+ip ssh version 2	****Fuerza al router a usar la versión 2 de SSH, bloqueando 
+				ersión 1 que tiene vulnerabilidades conocidas.
+line vty 0 15		****Ingresa a la configuración de las líneas virtuales para 
+				xiones remotas (soporta hasta 16 sesiones simultáneas).
+login local		****Le indica a la línea que exija un usuario y contraseña utilizando la
+				base de datos local que creaste con el comando username.
+transport input ssh	*****Restringe el acceso remoto para que solo acepte conexiones SSH
+				, bloqueando protocolos inseguros como Telnet.
+username XXXX privilege 15 secret XXXXX	****Crea un usuario en la base de datos local con permisos 
+						inistrador totales (privilegio 15) y contraseña encriptada.
+
+router ospf 1  		***** Activa el protocolo de enrutamiento dinámico OSPF. Permite que routers grandes
+			ercambien sus rutas de forma automática sin tener que configurarlas una por una.
+show ip interface brief  ****Muestra un resumen rápido de todos los puertos, sus direcciones IP  y si
+				 están encendidos o apagados (Up/Down).
+ip route [Red_Destino] [Máscara] [IP_Siguiente_Salto]  *****Configura manualmente el camino hacia una red
+					remota indicando la IP del router vecino.
+
