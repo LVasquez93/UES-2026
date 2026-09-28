@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-page text-ink font-sans antialiased;
+  }
+  /* Cifras tabulares para que las columnas de dinero queden alineadas */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
+  }
+}
+
+@layer components {
+  .field-label {
+    @apply block text-xs font-semibold uppercase tracking-wide text-ink/60 mb-1;
+  }
+  .field {
+    @apply w-full rounded-lg border border-line bg-white px-3 py-2 text-sm
+           outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-4 py-2.5
+           text-sm font-semibold text-white transition hover:bg-accent-dark
+           disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium
+           text-ink/70 transition hover:bg-line/60;
+  }
+  .card {
+    @apply rounded-xl border border-line bg-surface;
+  }
+}
