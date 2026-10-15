@@ -45,3 +45,98 @@ show ip interface brief  ****Muestra un resumen rápido de todos los puertos, su
 ip route [Red_Destino] [Máscara] [IP_Siguiente_Salto]  *****Configura manualmente el camino hacia una red
 					remota indicando la IP del router vecino.
 
+Router1 > enable        
+Router1 # configure terminal       
+Router1(config)# hostname RouterB  
+   
+RouterB (config)# interface gigabite 0/0/0      
+RouterB (config-if)# ip address 172.16.0.1 255.255.0.0   
+RouterB (config-if)# description RED B     
+RouterB (config-if)# no shutdown      
+RouterB (config-if)# exit  
+
+***************************** CONFIGURAR INTERFACE SERIALES DCE 0/1/1 y DCT 0/1/0**********************************************
+Router(config)#interface serial 0/0   
+Router(config-if)#ip address 170.16.2.1 255.255.0.0   
+Router(config-if)#clock rate 56000   
+Router(config-if)# bandwidth 100000   
+Router(config-if)#no shutdown
+
+
+RouterB (config)# interface se 0/1/0     
+RouterB (config-if)# ip address 10.0.0.2 255.255.255.252  
+RouterB (config-if)# no shutdown      
+RouterB (config-if)# exit 
+
+RouterB (config)# interface serial 0/1/1     
+RouterB (config-if)# ip address 10.0.0.5 255.255.255.252  
+RouterB (config-if)# clock rate 72000     
+RouterB (config-if)# no shutdown      
+RouterB (config-if)# exit  
+
+RouterB (config)# do wr        
+RouterB (config)# exit  
+RouterB# show ip route
+
+***********************************************ROUTING ESTATICO *********************************************
+
+ip route (routing estático)		****** {ip destino + mascara} [ip_salto mas proximo ó interface] + distancia 1-255
+
+RouterA (config)# ip route 172.16.0.0 255.255.0.0 10.0.0.2   
+RouterA (config)# ip route 10.0.0.4 255.255.255.252 10.0.0.2 
+RouterA (config)# ip route 192.168.20.0 255.255.255.0 10.0.0.2
+RouterA (config)# do wr
+
+RouterC (config)# ip route 172.16.0.0 255.255.0.0 se 0/1/0  
+RouterC (config)# ip route 10.0.0.0 255.255.255.252 se 0/1/0  
+RouterC (config)# ip route 192.168.10.0 255.255.255.0 se 0/1/0
+RouterC (config)# do wr 
+
+RouterB (config)# ip route 0.0.0.0 0.0.0.0 se0/1/1   
+RouterB (config)# do wr 
+
+*******************************************Redistribución rutas estáticas/dinámicas con rip v2******************************
+Router0 (config)# interface se 0/1/0      
+Router0 (config-if)# ip address 11.0.2.2 255.255.255.252   
+Router0 (config-if)# no shutdown      
+Router0 (config-if)# exit  
+
+Router0 (config)# ip route 0.0.0.0 0.0.0.0 se 0/1/0   
+
+Router0 (config)# ip route 192.168.20.0 255.255.255.0 se 0/1/0  
+Router0 (config)# router rip       
+Router0 (config-router)# version 2      
+Router0 (config-router)# passive-interface se 0/1 /0   
+Router0 (config-router)# default-information originate  
+Router0 (config-router)# redistribute static  
+Router0 (config-router)# exit  
+Router0 (config)# do wr 
+
+
+*************************************************ROUTING DINAMICO *********************************************
+Router1 (config)# router rip       
+Router1 (config-router)# versión 2      
+Router1 (config-router)# network 172.16.0.0    
+Router1 (config-router)# network 10.0.2.0     
+Router1 (config-router)# no auto-summary    
+Router1 (config-router)# passive-interface gi 0/0 /0   
+Router1 (config-router)# exit  
+Router1 (config)# do wr  
+
+
+copy running-config startup-config 
+show running-config	***** copia y muestra de la ram a la nvram
+  
+copy startup-config running-config   
+show startup-config	***** copia y muestra de la nvram a la ram
+ 
+erase startup-config 	***** borra NVRAM
+reload  		***** borra Ram (reinicio)
+
+
+
+
+
+
+
+
