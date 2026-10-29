@@ -113,7 +113,7 @@ Router0 (config-router)# exit
 Router0 (config)# do wr 
 
 
-*************************************************ROUTING DINAMICO *********************************************
+*************************************************ROUTING DINAMICO RIP v2 *********************************************
 Router1 (config)# router rip       
 Router1 (config-router)# versión 2      
 Router1 (config-router)# network 172.16.0.0    
@@ -135,7 +135,17 @@ reload  		***** borra Ram (reinicio)
 
 
 
-
+***********************************************ROUTING EIGRP *****************************************************
+enable
+configure terminal
+do show ip route
+Router(config)# router eigrp 100
+Router(config-router)# eigrp router-id 2.2.2.2
+Router(config-router)# network 192.168.20.0 0.0.0.255
+Router(config-router)# network 10.0.0.0 0.0.0.3
+Router(config-router)# passive-interface GigabitEthernet0/1
+Router(config-router)# no passive-interface se 0/0/0
+Router(config-router)# no auto-summary
 
 
 
